@@ -25,26 +25,25 @@ namespace Sudoqu {
 
 Player::Player(QTcpSocket *s) {
     if (s == nullptr) {
-        socket = new QTcpSocket;
+        socket.reset(new QTcpSocket);
     } else {
-        socket = s;
+        socket.reset(s);
     }
-}
-
-Player::Player(int i, QString n) : name(n), id(i) {
 }
 
 void Player::connectToGame(QString host) {
     socket->connectToHost(host, 19770);
 
-    connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this,
+    connect(socket.get(), static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this,
             &Player::socketError);
-    connect(socket, &QTcpSocket::connected, this, &Player::clientConnected);
-    connect(socket, &QTcpSocket::disconnected, this, &Player::clientDisconnected);
+    connect(socket.get(), &QTcpSocket::connected, this, &Player::clientConnected);
+    connect(socket.get(), &QTcpSocket::disconnected, this, &Player::clientDisconnected);
 }
 
 void Player::disconnectFromServer() {
-	socket->disconnect();
+    QJsonObject obj;
+    obj["message"] = DISCONNECT;
+    sendMessage(obj);
 }
 
 void Player::setName(QString n) {
@@ -80,8 +79,12 @@ void Player::setReady(bool r, bool send) {
     }
 }
 
+void Player::wait() {
+    socket->waitForBytesWritten(3000);
+}
+
 void Player::sendMessage(QJsonObject &obj) {
-    sendNetworkMessage(obj, socket);
+    sendNetworkMessage(obj, socket.get());
 }
 
 void Player::setId(int i) {
@@ -89,17 +92,20 @@ void Player::setId(int i) {
 }
 
 void Player::clientConnected() {
-    connect(socket, &QTcpSocket::readyRead, this, &Player::dataReceived);
+    connect(socket.get(), &QTcpSocket::readyRead, this, &Player::dataReceived);
     emit playerConnected();
 }
 
 void Player::clientDisconnected() {
-    emit playerDisconnected();
+    if (socket->state() == QAbstractSocket::UnconnectedState || socket->waitForDisconnected(1000)) {
+        emit playerDisconnected();
+    }
 }
 
 void Player::dataReceived() {
+    bool disconnect = false;
     QString data;
-    while (socket->canReadLine()) {
+    while (socket != nullptr && socket->canReadLine()) {
         data = socket->readLine();
         QJsonObject obj = readNetworkMessage(data);
         if (obj.contains("message")) {
@@ -127,13 +133,25 @@ void Player::dataReceived() {
                     list.emplace_back(obj["players"].toArray()[i].toString(), obj["ready"].toArray()[i].toBool());
                 }
                 emit receivedReadyChanges(list);
+            } else if (message == DISCONNECT) {
+                QString name = obj["name"].toString();
+                emit otherPlayerDisconnected(name);
+            } else if (message == DISCONNECT_OK) {
+                // socket->disconnectFromHost();
+                disconnect = true;
+
+            } else if (message == SERVER_DOWN) {
+                disconnect = true;
             }
         }
     }
+
+    if (disconnect) {
+        socket->disconnectFromHost();
+    }
 }
 
-void Player::socketError(QAbstractSocket::SocketError err) {
-	emit playerDisconnected();
+void Player::socketError(QAbstractSocket::SocketError) {
+    // emit playerDisconnected();
 }
-
 }

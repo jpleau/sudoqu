@@ -37,4 +37,5 @@ private:
     qqwing::SudokuBoard board;
 };
 }
+
 #endif

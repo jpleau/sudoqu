@@ -31,12 +31,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         game.reset(new Game(this));
         game->start();
         ui->start_server->setEnabled(false);
+        ui->stop_server->setEnabled(true);
+        connect(ui->stop_server, &QPushButton::clicked, [=]() {
+            if (game) {
+                game->stop();
+                game.reset();
+            }
+            ui->start_server->setEnabled(true);
+            ui->stop_server->setEnabled(false);
+        });
     });
 
     connect(ui->connect_server, &QPushButton::clicked, this, &MainWindow::connectPlayer);
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::connectPlayer);
     connect(ui->host, &QLineEdit::returnPressed, this, &MainWindow::connectPlayer);
-    connect(ui->disconnect_server, &QPushButton::clicked, this, &MainWindow::disconnectPlayer);
+    connect(ui->disconnect_server, &QPushButton::clicked, [=]() {
+        if (me) {
+            me->disconnectFromServer();
+        }
+    });
 }
 
 MainWindow::~MainWindow() {
@@ -63,17 +76,18 @@ void MainWindow::connectPlayer() {
         me->connectToGame(host);
         ui->connect_server->setEnabled(false);
         ui->disconnect_server->setEnabled(true);
-		ui->nickname->setEnabled(false);
-		ui->host->setEnabled(false);
-		ui->ready->setEnabled(true);
-		
-		connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
-		
+        ui->nickname->setEnabled(false);
+        ui->host->setEnabled(false);
+        ui->ready->setEnabled(true);
+
+        connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
+
         connect(me.get(), &Player::receivedNewPlayer, [this](int, QString name) {
             QString message = QString("<strong>%1</strong> has connected.").arg(name);
             ui->chat_area->appendHtml(message);
         });
 
+		
         connect(me.get(), &Player::playerConnected, [=]() {
             ui->chat_send_button->setEnabled(true);
             connect(ui->chat_send_button, &QPushButton::clicked, this, &MainWindow::sendChatMessage);
@@ -91,26 +105,32 @@ void MainWindow::connectPlayer() {
                 QString name = std::get<0>(t);
                 bool ready = std::get<1>(t);
                 QString color(ready ? "#00cc00" : "#cc0000");
-                QString msg =
-                    QString(R"(<strong style="color: %2">%1</strong><br/>)").arg(name).arg(color);
+                QString msg = QString(R"(<strong style="color: %2">%1</strong><br/>)").arg(name).arg(color);
                 ui->player_list->appendHtml(msg);
             }
         });
 
+        connect(me.get(), &Player::otherPlayerDisconnected, [=](QString name) {
+            QString message = QString("<strong>%1</strong> has disconnected.").arg(name);
+            ui->chat_area->appendHtml(message);
+        });
+
+		
         connect(ui->ready, &QCheckBox::clicked, [=](bool checked) { me->setReady(checked, true); });
     }
 }
 
 void MainWindow::disconnectPlayer() {
-	me->disconnectFromServer();
-	me.reset();
-	ui->connect_server->setEnabled(true);
+    ui->connect_server->setEnabled(true);
     ui->disconnect_server->setEnabled(false);
-	ui->nickname->setEnabled(true);
-	ui->host->setEnabled(true);
-	ui->ready->setEnabled(false);
-	ui->chat_area->clear();
-	ui->player_list->clear();
+    ui->nickname->setEnabled(true);
+    ui->host->setEnabled(true);
+    ui->ready->setEnabled(false);
+    ui->chat_area->clear();
+    ui->player_list->clear();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::sendChatMessage() {

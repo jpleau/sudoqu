@@ -36,6 +36,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="stop_server">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Stop server</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QWidget" name="horizontalWidget_4" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -46,6 +56,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QLineEdit" name="nickname">
+             <property name="text">
+              <string>Jason</string>
+             </property>
              <property name="placeholderText">
               <string>Nickname</string>
              </property>
@@ -53,6 +66,9 @@
            </item>
            <item>
             <widget class="QLineEdit" name="host">
+             <property name="text">
+              <string>localhost</string>
+             </property>
              <property name="placeholderText">
               <string>Host</string>
              </property>

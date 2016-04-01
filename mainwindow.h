@@ -43,10 +43,11 @@ private:
     Ui::MainWindow *ui;
     std::unique_ptr<Game> game;
     std::unique_ptr<Player> me;
-	
-	void sendChatMessage();
-	void connectPlayer();
-	void disconnectPlayer();
+
+    void sendChatMessage();
+    void connectPlayer();
+    void disconnectPlayer();
+    void closeEvent(QCloseEvent *);
 };
 }
 

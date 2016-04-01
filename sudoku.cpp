@@ -22,6 +22,7 @@
 
 #include <QDebug>
 
+#include <ctime>
 #include <vector>
 
 namespace Sudoqu {

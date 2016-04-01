@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QTcpSocket>
 
+#include <memory>
 #include <tuple>
 #include <vector>
 
@@ -32,9 +33,9 @@ class Player : public QObject {
 
 public:
     Player(QTcpSocket * = nullptr);
-    Player(int, QString);
+
     void connectToGame(QString);
-	void disconnectFromServer();
+    void disconnectFromServer();
 
     void setName(QString);
     QString getName() const;
@@ -42,37 +43,39 @@ public:
     void setId(int);
     int getId() const;
 
-	void sendChatMessage(QString);
-	
+    void sendChatMessage(QString);
+
     operator QTcpSocket *() {
-        return socket;
+        return socket.get();
     }
 
-	bool getReady() const;
-	void setReady(bool, bool = false);
+    bool getReady() const;
+    void setReady(bool, bool = false);
 	
+	void wait();
+
 signals:
-	void receivedNewPlayer(int, QString);
-	void playerConnected();
-	void playerDisconnected();
-	void receivedChatMessage(QString, QString);
-	void receivedReadyChanges(std::vector<std::tuple<QString, bool>>&);
+    void receivedNewPlayer(int, QString);
+    void playerConnected();
+    void playerDisconnected();
+    void receivedChatMessage(QString, QString);
+    void receivedReadyChanges(std::vector<std::tuple<QString, bool>> &);
+    void otherPlayerDisconnected(QString);
 
 private:
-	QTcpSocket *socket;
+    std::unique_ptr<QTcpSocket> socket;
     QString name;
     int id;
-	bool ready = false;
+    bool ready = false;
 
-	void sendMessage(QJsonObject &);
-	
+    void sendMessage(QJsonObject &);
+
 private slots:
     void clientConnected();
-	void clientDisconnected();
+    void clientDisconnected();
     void dataReceived();
-	void socketError(QAbstractSocket::SocketError);
+    void socketError(QAbstractSocket::SocketError);
 };
-
 };
 
 #endif // PLAYER_H
