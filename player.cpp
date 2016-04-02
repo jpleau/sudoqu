@@ -20,6 +20,7 @@
 #include "network.h"
 
 #include <QJsonArray>
+#include <QTcpSocket>
 
 namespace Sudoqu {
 
@@ -36,9 +37,6 @@ Player::Player(QTcpSocket *s) {
 
 void Player::connectToGame(QString host) {
     socket->connectToHost(host, 19770);
-
-    connect(socket.get(), static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this,
-            &Player::socketError);
     connect(socket.get(), &QTcpSocket::connected, this, &Player::clientConnected);
     connect(socket.get(), &QTcpSocket::disconnected, this, &Player::clientDisconnected);
 }
@@ -183,9 +181,6 @@ void Player::dataReceived() {
             }
         }
     }
-}
-
-void Player::socketError(QAbstractSocket::SocketError) {
 }
 
 ReadyChange::ReadyChange(bool d, bool r, int c, QString n) : done(d), ready(r), count(c), name(n) {

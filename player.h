@@ -20,11 +20,13 @@
 #define PLAYER_H
 
 #include <QObject>
-#include <QTcpSocket>
+#include <QString>
 
 #include <memory>
-#include <tuple>
 #include <vector>
+
+class QObject;
+class QTcpSocket;
 
 namespace Sudoqu {
 
@@ -93,7 +95,6 @@ private slots:
     void clientConnected();
     void clientDisconnected();
     void dataReceived();
-    void socketError(QAbstractSocket::SocketError);
 };
 };
 
