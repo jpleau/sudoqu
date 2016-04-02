@@ -35,6 +35,7 @@ enum Messages : int {
     DISCONNECT_OK,
     SERVER_DOWN,
     NEW_GAME,
+    NEW_COUNT,
 };
 
 void sendNetworkMessage(QJsonObject &, QTcpSocket *);

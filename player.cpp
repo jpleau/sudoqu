@@ -82,6 +82,13 @@ void Player::setReady(bool r, bool send) {
     }
 }
 
+void Player::sendCount(int n) {
+    QJsonObject obj;
+    obj["message"] = NEW_COUNT;
+    obj["count"] = n;
+    sendMessage(obj);
+}
+
 void Player::wait() {
     socket->waitForBytesWritten(3000);
 }
@@ -130,11 +137,19 @@ void Player::dataReceived() {
                 emit receivedChatMessage(name, text);
             } else if (message == READY_CHANGE) {
                 int size = obj["players"].toArray().size();
-                std::vector<std::tuple<QString, bool>> list;
+                int count_total = obj["count_total"].toInt();
+                std::vector<std::tuple<QString, bool, int, bool>> list;
+
+                auto players = obj["players"].toArray();
+                auto ready = obj["ready"].toArray();
+                auto counts = obj["counts"].toArray();
+                auto done = obj["done"].toArray();
+
                 for (int i = 0; i < size; ++i) {
-                    list.emplace_back(obj["players"].toArray()[i].toString(), obj["ready"].toArray()[i].toBool());
+                    list.emplace_back(players[i].toString(), ready[i].toBool(), counts[i].toInt(), done[i].toBool());
                 }
-                emit receivedReadyChanges(list);
+
+                emit receivedReadyChanges(list, count_total);
             } else if (message == DISCONNECT) {
                 QString name = obj["name"].toString();
                 emit otherPlayerDisconnected(name);

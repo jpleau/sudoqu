@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     });
     connect(ui->start_game, &QPushButton::clicked, [=]() { game->start_game(); });
+
+    connect(ui->frame, &GameFrame::setCount, [=](int n) { me->sendCount(n); });
 }
 
 MainWindow::~MainWindow() {
@@ -99,16 +101,33 @@ void MainWindow::connectPlayer() {
             ui->chat_area->appendHtml(msg);
         });
 
-        connect(me.get(), &Player::receivedReadyChanges, [=](std::vector<std::tuple<QString, bool>> &list) {
-            ui->player_list->clear();
-            for (auto t : list) {
-                QString name = std::get<0>(t);
-                bool ready = std::get<1>(t);
-                QString color(ready ? "#00cc00" : "#cc0000");
-                QString msg = QString(R"(<strong style="color: %2">%1</strong><br/>)").arg(name).arg(color);
-                ui->player_list->appendHtml(msg);
-            }
-        });
+        connect(me.get(), &Player::receivedReadyChanges,
+                [=](std::vector<std::tuple<QString, bool, int, bool>> &list, int count_total) {
+                    ui->player_list->clear();
+                    for (auto t : list) {
+                        QString name = std::get<0>(t);
+                        bool ready = std::get<1>(t);
+                        int count = std::get<2>(t);
+                        bool done = std::get<3>(t);
+                        QColor color;
+
+                        if (ui->frame->isGameActive()) {
+                            if (count == count_total) {
+                                color = done ? Qt::green : Qt::red;
+                            } else {
+                                color = Qt::black;
+                            }
+                        } else {
+                            color = ready ? Qt::green : Qt::red;
+                        }
+                        QString msg = QString(R"(<strong style="color: %2">%1)").arg(name).arg(color.name());
+                        if (count_total > 0) {
+                            msg += QString(" (%1 / %2)").arg(count).arg(count_total);
+                        }
+                        msg += "</strong><br/>";
+                        ui->player_list->appendHtml(msg);
+                    }
+                });
 
         connect(me.get(), &Player::otherPlayerDisconnected, [=](QString name) {
             QString message = QString("<strong>%1</strong> has disconnected.").arg(name);
@@ -130,6 +149,7 @@ void MainWindow::disconnectPlayer() {
     ui->ready->setEnabled(false);
     ui->chat_area->clear();
     ui->player_list->clear();
+    ui->frame->stop();
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {

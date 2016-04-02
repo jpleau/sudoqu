@@ -20,7 +20,8 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <iostream>
+#include <QMouseEvent>
+#include <QKeyEvent>
 
 namespace Sudoqu {
 
@@ -28,10 +29,6 @@ GameFrame::GameFrame(QWidget *parent) : QFrame(parent), active(false) {
 }
 
 void GameFrame::newBoard(std::vector<int> b) {
-    for (int i : b) {
-        std::cout << i << ", ";
-    }
-    std::cout << std::endl;
     board = b;
     given = b;
     active = true;
@@ -48,6 +45,17 @@ void GameFrame::setAt(int pos, int val) {
 
 int GameFrame::getGivenAt(int pos) const {
     return given[static_cast<size_t>(pos)];
+}
+
+void GameFrame::stop() {
+    board.clear();
+    given.clear();
+    active = false;
+    repaint();
+}
+
+bool GameFrame::isGameActive() const {
+    return active;
 }
 
 void GameFrame::paintEvent(QPaintEvent *) {
@@ -68,11 +76,15 @@ void GameFrame::paintEvent(QPaintEvent *) {
 
     QBrush brush(Qt::SolidPattern);
 
-    QFont font("Ubuntu", 30);
+    int fontSize = 30;
+    if (window_width < 500 || window_height < 500) {
+        fontSize = 12;
+    }
+
+    QFont font("Ubuntu", fontSize);
     painter.setFont(font);
 
     QPen pen(Qt::black);
-
     painter.setRenderHint(QPainter::Antialiasing);
 
     painter.setPen(pen);
@@ -88,6 +100,10 @@ void GameFrame::paintEvent(QPaintEvent *) {
                 painter.fillRect(rect, Qt::gray);
             }
 
+            if (pos == focused) {
+                painter.fillRect(rect, Qt::yellow);
+            }
+
             if (value > 0) {
                 QString text = QString::number(value);
                 painter.drawText(rect, Qt::AlignVCenter | Qt::AlignCenter, text);
@@ -101,7 +117,84 @@ void GameFrame::paintEvent(QPaintEvent *) {
             painter.drawLine(x * width, y * height, x * width, y * height + height);
         }
     }
+
+    pen.setWidth(5);
+    painter.setPen(pen);
+    painter.drawLine(0, 0, rows * width, 0);
+    painter.drawLine(0, 0, 0, cols * height);
     painter.drawLine(0, rows * height, cols * width, rows * height);
     painter.drawLine(cols * width, 0, cols * width, rows * height);
+    painter.drawLine(0, height * 3, rows * width, height * 3);
+    painter.drawLine(0, height * 6, rows * width, height * 6);
+    painter.drawLine(width * 3, 0, width * 3, cols * height);
+    painter.drawLine(width * 6, 0, width * 6, cols * height);
+}
+
+void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
+    if (!active) {
+        return;
+    }
+
+    setFocus();
+
+    int window_width = geometry().size().width();
+    int window_height = geometry().size().height();
+
+    int width = window_width / 9;
+    int height = window_height / 9;
+
+    const int x = event->pos().x();
+    const int y = event->pos().y();
+
+    int col = x / width;
+    int row = y / height;
+
+    int pos = row * 9 + col;
+
+    if (getGivenAt(pos) > 0) {
+        focused = -1;
+        return;
+    }
+
+    focused = pos;
+
+    repaint();
+}
+
+void GameFrame::keyPressEvent(QKeyEvent *event) {
+    if (focused == -1) {
+        return;
+    }
+    int key = event->key();
+    if (key == Qt::Key_0 || key == Qt::Key_Escape || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
+        setAt(focused, 0);
+    } else {
+        auto check = key_map.find(key);
+        if (check != key_map.end()) {
+            int value = check->second;
+            setAt(focused, value);
+
+            int given_filled = 0;
+            int board_filled = 0;
+            int player_filled = 0;
+
+            for (int i : given) {
+                if (i > 0) {
+                    ++given_filled;
+                }
+            }
+
+            for (int i : board) {
+                if (i > 0) {
+                    ++board_filled;
+                }
+            }
+
+            player_filled = board_filled - given_filled;
+            emit setCount(player_filled);
+        }
+    }
+
+    repaint();
 }
 }

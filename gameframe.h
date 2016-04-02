@@ -21,11 +21,13 @@
 
 #include <QFrame>
 
+#include <map>
 #include <vector>
 
 namespace Sudoqu {
 
 class GameFrame : public QFrame {
+    Q_OBJECT
 public:
     GameFrame(QWidget * = nullptr);
 
@@ -36,15 +38,29 @@ public:
 
     int getGivenAt(int) const;
 
+    void stop();
+
+    bool isGameActive() const;
+
+signals:
+    void setCount(int);
+
 protected:
     void paintEvent(QPaintEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+    void keyPressEvent(QKeyEvent *) override;
 
 private:
     bool active;
     std::vector<int> board;
     std::vector<int> given;
 
-    int focused;
+    std::map<int, int> key_map = {
+        {Qt::Key_1, 1}, {Qt::Key_2, 2}, {Qt::Key_3, 3}, {Qt::Key_4, 4}, {Qt::Key_5, 5},
+        {Qt::Key_6, 6}, {Qt::Key_7, 7}, {Qt::Key_8, 8}, {Qt::Key_9, 9},
+    };
+
+    int focused = -1;
 };
 }
 

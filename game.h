@@ -46,6 +46,7 @@ private:
     int current_id;
     std::map<QTcpSocket *, std::shared_ptr<Player>> players;
     std::unique_ptr<Sudoku> board;
+    bool active = false;
 
     void sendMessageToPlayer(QJsonObject &, Player *);
     void sendMessageToAllPlayers(QJsonObject &);
@@ -53,6 +54,7 @@ private:
     void sendMessageToPlayersExcept(QJsonObject &, Player *);
     void sendReadyChange(Player * = nullptr);
     std::vector<Player *> listPlayers(Player * = nullptr);
+    std::map<int, int> counts;
 
 private slots:
     void clientConnected();

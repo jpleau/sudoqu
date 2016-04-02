@@ -36,10 +36,12 @@ void Game::start_game() {
     board.reset(new Sudoku);
     board->generate();
 
+    active = true;
+
     QJsonObject obj;
     obj["message"] = NEW_GAME;
 
-    std::vector<int> puzzle = board->get_puzzle();
+    std::vector<int> puzzle = board->getPuzzle();
     std::list<QVariant> list(puzzle.begin(), puzzle.end());
     QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
 
@@ -47,6 +49,7 @@ void Game::start_game() {
     obj["board"] = array;
 
     sendMessageToAllPlayers(obj);
+    sendReadyChange();
 }
 
 void Game::start_server() {
@@ -141,18 +144,42 @@ std::vector<Player *> Game::listPlayers(Player *exceptPlayer) {
 void Game::sendReadyChange(Player *except) {
     QJsonArray list_players;
     QJsonArray list_ready;
+    QJsonArray list_count;
+    QJsonArray list_done;
+
+    QJsonObject send;
+
+    int count_total = 0;
+    if (active) {
+        auto puzzle = board->getPuzzle();
+        for (int i : puzzle) {
+            if (i > 0) {
+                ++count_total;
+            }
+        }
+        count_total = static_cast<int>(puzzle.size()) - count_total;
+    }
+
+    send["count_total"] = count_total;
 
     for (auto &p : players) {
         if (p.second.get() != except) {
             list_players.append(p.second->getName());
             list_ready.append(p.second->getReady());
+            if (active) {
+                list_count.append(counts[p.second->getId()]);
+                list_done.append(true);
+            } else {
+                list_done.append(false);
+            }
         }
     }
 
-    QJsonObject send;
     send["message"] = READY_CHANGE;
     send["players"] = list_players;
     send["ready"] = list_ready;
+    send["counts"] = list_count;
+
     sendMessageToAllPlayers(send);
 }
 
@@ -182,6 +209,10 @@ void Game::dataReceived() {
                 sendReadyChange();
             } else if (message == DISCONNECT) {
                 clientDisconnected(socket);
+            } else if (message == NEW_COUNT) {
+                int count = obj["count"].toInt();
+                counts[player->getId()] = count;
+                sendReadyChange();
             }
         }
     }

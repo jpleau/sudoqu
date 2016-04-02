@@ -56,6 +56,8 @@ public:
     bool getReady() const;
     void setReady(bool, bool = false);
 
+    void sendCount(int);
+
     void wait();
 
 signals:
@@ -63,7 +65,7 @@ signals:
     void playerConnected();
     void playerDisconnected();
     void receivedChatMessage(QString, QString);
-    void receivedReadyChanges(std::vector<std::tuple<QString, bool>> &);
+    void receivedReadyChanges(std::vector<std::tuple<QString, bool, int, bool>> &, int);
     void otherPlayerDisconnected(QString);
     void receivedNewBoard(std::vector<int> &);
 
