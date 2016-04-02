@@ -125,10 +125,20 @@
            <item>
             <widget class="QPushButton" name="start_game">
              <property name="enabled">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="text">
               <string>Start Game</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="cheat">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Cheat</string>
              </property>
             </widget>
            </item>

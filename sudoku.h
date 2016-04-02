@@ -31,6 +31,7 @@ class Sudoku {
 public:
     Sudoku();
     void generate(SB::Difficulty = SB::EASY);
+    void setBoard(std::vector<int> &);
     const std::vector<int> &getPuzzle() const;
     const std::vector<int> &getSolution() const;
     void print();

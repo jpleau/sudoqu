@@ -50,6 +50,14 @@ void Sudoku::generate(SB::Difficulty difficulty) {
     solution.assign(_solution, _solution + qqwing::BOARD_SIZE);
 }
 
+void Sudoku::setBoard(std::vector<int> &b) {
+    board.setPuzzle(&b[0]);
+    board.solve();
+
+    const int *_solution = board.getSolution();
+    solution.assign(_solution, _solution + qqwing::BOARD_SIZE);
+}
+
 const std::vector<int> &Sudoku::getPuzzle() const {
     return puzzle;
 }

@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             ui->start_server->setEnabled(true);
             ui->stop_server->setEnabled(false);
         });
+        connect(ui->start_game, &QPushButton::clicked, game.get(), &Game::start_game);
     });
 
     connect(ui->connect_server, &QPushButton::clicked, this, &MainWindow::connectPlayer);
@@ -50,9 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             me->disconnectFromServer();
         }
     });
-    connect(ui->start_game, &QPushButton::clicked, [=]() { game->start_game(); });
 
-    connect(ui->frame, &GameFrame::setCount, [=](int n) { me->sendCount(n); });
+    connect(ui->cheat, &QPushButton::clicked, ui->frame, &GameFrame::cheat);
 }
 
 MainWindow::~MainWindow() {
@@ -83,6 +83,10 @@ void MainWindow::connectPlayer() {
         ui->host->setEnabled(false);
         ui->ready->setEnabled(true);
 
+        if (game) {
+            ui->start_game->setEnabled(true);
+        }
+
         connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
 
         connect(me.get(), &Player::receivedNewPlayer, [this](int, QString name) {
@@ -101,33 +105,28 @@ void MainWindow::connectPlayer() {
             ui->chat_area->appendHtml(msg);
         });
 
-        connect(me.get(), &Player::receivedReadyChanges,
-                [=](std::vector<std::tuple<QString, bool, int, bool>> &list, int count_total) {
-                    ui->player_list->clear();
-                    for (auto t : list) {
-                        QString name = std::get<0>(t);
-                        bool ready = std::get<1>(t);
-                        int count = std::get<2>(t);
-                        bool done = std::get<3>(t);
-                        QColor color;
+        connect(me.get(), &Player::receivedReadyChanges, [=](std::vector<ReadyChange> &list, int count_total) {
+            ui->player_list->clear();
+            for (auto p : list) {
+                QColor color;
 
-                        if (ui->frame->isGameActive()) {
-                            if (count == count_total) {
-                                color = done ? Qt::green : Qt::red;
-                            } else {
-                                color = Qt::black;
-                            }
-                        } else {
-                            color = ready ? Qt::green : Qt::red;
-                        }
-                        QString msg = QString(R"(<strong style="color: %2">%1)").arg(name).arg(color.name());
-                        if (count_total > 0) {
-                            msg += QString(" (%1 / %2)").arg(count).arg(count_total);
-                        }
-                        msg += "</strong><br/>";
-                        ui->player_list->appendHtml(msg);
+                if (ui->frame->isGameActive()) {
+                    if (p.count == count_total) {
+                        color = p.done ? Qt::green : Qt::red;
+                    } else {
+                        color = Qt::black;
                     }
-                });
+                } else {
+                    color = p.ready ? Qt::green : Qt::red;
+                }
+                QString msg = QString(R"(<strong style="color: %2">%1)").arg(name).arg(color.name());
+                if (count_total > 0) {
+                    msg += QString(" (%1 / %2)").arg(p.count).arg(count_total);
+                }
+                msg += "</strong><br/>";
+                ui->player_list->appendHtml(msg);
+            }
+        });
 
         connect(me.get(), &Player::otherPlayerDisconnected, [=](QString name) {
             QString message = QString("<strong>%1</strong> has disconnected.").arg(name);
@@ -137,6 +136,8 @@ void MainWindow::connectPlayer() {
         connect(me.get(), &Player::receivedNewBoard, this, &MainWindow::newBoard);
 
         connect(ui->ready, &QCheckBox::clicked, [=](bool checked) { me->setReady(checked, true); });
+        connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
+        connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
     }
 }
 
@@ -147,6 +148,8 @@ void MainWindow::disconnectPlayer() {
     ui->nickname->setEnabled(true);
     ui->host->setEnabled(true);
     ui->ready->setEnabled(false);
+    ui->cheat->setEnabled(false);
+    ui->start_game->setEnabled(false);
     ui->chat_area->clear();
     ui->player_list->clear();
     ui->frame->stop();
@@ -158,6 +161,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
 
 void MainWindow::newBoard(std::vector<int> &board) {
     ui->frame->newBoard(board);
+    ui->cheat->setEnabled(true);
 }
 
 void MainWindow::sendChatMessage() {

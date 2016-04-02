@@ -141,6 +141,11 @@ std::vector<Player *> Game::listPlayers(Player *exceptPlayer) {
     return ret;
 }
 
+bool Game::checkSolution(std::vector<int> &board_check) const {
+    std::vector<int> solution = board->getSolution();
+    return board_check == solution;
+}
+
 void Game::sendReadyChange(Player *except) {
     QJsonArray list_players;
     QJsonArray list_ready;
@@ -168,7 +173,7 @@ void Game::sendReadyChange(Player *except) {
             list_ready.append(p.second->getReady());
             if (active) {
                 list_count.append(counts[p.second->getId()]);
-                list_done.append(true);
+                list_done.append(p.second->isDone());
             } else {
                 list_done.append(false);
             }
@@ -179,6 +184,7 @@ void Game::sendReadyChange(Player *except) {
     send["players"] = list_players;
     send["ready"] = list_ready;
     send["counts"] = list_count;
+    send["done"] = list_done;
 
     sendMessageToAllPlayers(send);
 }
@@ -212,6 +218,15 @@ void Game::dataReceived() {
             } else if (message == NEW_COUNT) {
                 int count = obj["count"].toInt();
                 counts[player->getId()] = count;
+                sendReadyChange();
+            } else if (message == TEST_SOLUTION) {
+                QJsonArray array = obj["board"].toArray();
+                std::vector<int> board;
+                counts[player->getId()] = obj["count"].toInt();
+                for (int i = 0; i < array.size(); ++i) {
+                    board.push_back(array[i].toInt());
+                }
+                player->setDone(checkSolution(board));
                 sendReadyChange();
             }
         }

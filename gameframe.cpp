@@ -17,6 +17,7 @@
  */
 
 #include "gameframe.h"
+#include "sudoku.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -56,6 +57,23 @@ void GameFrame::stop() {
 
 bool GameFrame::isGameActive() const {
     return active;
+}
+
+void GameFrame::cheat() {
+    Sudoku s;
+    s.setBoard(given);
+    board = s.getSolution();
+
+    int given_filled = 0;
+    for (int i : given) {
+        if (i > 0) {
+            ++given_filled;
+        }
+    }
+
+    sendData();
+
+    repaint();
 }
 
 void GameFrame::paintEvent(QPaintEvent *) {
@@ -168,33 +186,41 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
     int key = event->key();
     if (key == Qt::Key_0 || key == Qt::Key_Escape || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
         setAt(focused, 0);
+        sendData();
     } else {
         auto check = key_map.find(key);
         if (check != key_map.end()) {
             int value = check->second;
             setAt(focused, value);
-
-            int given_filled = 0;
-            int board_filled = 0;
-            int player_filled = 0;
-
-            for (int i : given) {
-                if (i > 0) {
-                    ++given_filled;
-                }
-            }
-
-            for (int i : board) {
-                if (i > 0) {
-                    ++board_filled;
-                }
-            }
-
-            player_filled = board_filled - given_filled;
-            emit setCount(player_filled);
+            sendData();
         }
     }
 
     repaint();
+}
+
+void GameFrame::sendData() {
+    int given_filled = 0;
+    int board_filled = 0;
+    int player_filled = 0;
+
+    for (int i : board) {
+        if (i > 0) {
+            ++board_filled;
+        }
+    }
+
+    for (int i : given) {
+        if (i > 0) {
+            ++given_filled;
+        }
+    }
+
+    player_filled = board_filled - given_filled;
+    if (board_filled == 81) {
+        emit completeBoard(board, player_filled);
+    } else {
+        emit setCount(player_filled);
+    }
 }
 }

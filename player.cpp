@@ -89,10 +89,6 @@ void Player::sendCount(int n) {
     sendMessage(obj);
 }
 
-void Player::wait() {
-    socket->waitForBytesWritten(3000);
-}
-
 void Player::sendMessage(QJsonObject &obj) {
     sendNetworkMessage(obj, socket.get());
 }
@@ -110,6 +106,27 @@ void Player::clientDisconnected() {
     if (socket->state() == QAbstractSocket::UnconnectedState || socket->waitForDisconnected(1000)) {
         emit playerDisconnected();
     }
+}
+
+void Player::setDone(bool d) {
+    done = d;
+}
+
+bool Player::isDone() const {
+    return done;
+}
+
+void Player::testBoard(std::vector<int> &board, int count) {
+    QJsonObject obj;
+    std::list<QVariant> list(board.begin(), board.end());
+    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
+    QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
+
+    obj["message"] = TEST_SOLUTION;
+    obj["board"] = array;
+    obj["count"] = count;
+
+    sendMessage(obj);
 }
 
 void Player::dataReceived() {
@@ -138,7 +155,7 @@ void Player::dataReceived() {
             } else if (message == READY_CHANGE) {
                 int size = obj["players"].toArray().size();
                 int count_total = obj["count_total"].toInt();
-                std::vector<std::tuple<QString, bool, int, bool>> list;
+                std::vector<ReadyChange> list;
 
                 auto players = obj["players"].toArray();
                 auto ready = obj["ready"].toArray();
@@ -146,7 +163,7 @@ void Player::dataReceived() {
                 auto done = obj["done"].toArray();
 
                 for (int i = 0; i < size; ++i) {
-                    list.emplace_back(players[i].toString(), ready[i].toBool(), counts[i].toInt(), done[i].toBool());
+                    list.emplace_back(done[i].toBool(), ready[i].toBool(), counts[i].toInt(), players[i].toString());
                 }
 
                 emit receivedReadyChanges(list, count_total);
@@ -169,5 +186,8 @@ void Player::dataReceived() {
 }
 
 void Player::socketError(QAbstractSocket::SocketError) {
+}
+
+ReadyChange::ReadyChange(bool d, bool r, int c, QString n) : done(d), ready(r), count(c), name(n) {
 }
 }

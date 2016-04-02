@@ -42,8 +42,11 @@ public:
 
     bool isGameActive() const;
 
+    void cheat();
+
 signals:
     void setCount(int);
+    void completeBoard(std::vector<int> &, int);
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -61,6 +64,8 @@ private:
     };
 
     int focused = -1;
+
+    void sendData();
 };
 }
 
