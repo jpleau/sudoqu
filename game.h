@@ -40,7 +40,7 @@ public:
     Game(QObject * = nullptr);
     void start_server();
     void stop_server();
-    void start_game();
+    void start_game(SB::Difficulty);
 
 private:
     int current_id;
@@ -57,6 +57,7 @@ private:
     std::vector<Player *> listPlayers(Player * = nullptr);
     std::map<int, int> counts;
     bool checkSolution(std::vector<int> &) const;
+    QJsonObject sendBoard();
 
 private slots:
     void clientConnected();

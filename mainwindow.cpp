@@ -27,6 +27,11 @@ namespace Sudoqu {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    ui->difficulty->addItem("Simple", SB::SIMPLE);
+    ui->difficulty->addItem("Easy", SB::EASY);
+    ui->difficulty->addItem("Intermedia", SB::INTERMEDIATE);
+    ui->difficulty->addItem("Expert", SB::EXPERT);
+
     connect(ui->start_server, &QPushButton::clicked, [=]() {
         game.reset(new Game(this));
         game->start_server();
@@ -40,7 +45,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             ui->start_server->setEnabled(true);
             ui->stop_server->setEnabled(false);
         });
-        connect(ui->start_game, &QPushButton::clicked, game.get(), &Game::start_game);
+        connect(ui->start_game, &QPushButton::clicked, [=]() {
+            int selectedDifficulty = ui->difficulty->itemData(ui->difficulty->currentIndex()).toInt();
+            SB::Difficulty difficulty = static_cast<SB::Difficulty>(selectedDifficulty);
+            game->start_game(difficulty);
+
+        });
     });
 
     connect(ui->connect_server, &QPushButton::clicked, this, &MainWindow::connectPlayer);
@@ -156,12 +166,15 @@ void MainWindow::disconnectPlayer() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
-    // TODO: send disconnect
+    if (me) {
+        me->disconnectFromServer();
+    }
 }
 
 void MainWindow::newBoard(std::vector<int> &board) {
     ui->frame->newBoard(board);
     ui->cheat->setEnabled(true);
+    ui->ready->setEnabled(false);
 }
 
 void MainWindow::sendChatMessage() {

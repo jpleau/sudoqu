@@ -184,9 +184,11 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
         return;
     }
     int key = event->key();
-    if (key == Qt::Key_0 || key == Qt::Key_Escape || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
+    if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
         setAt(focused, 0);
         sendData();
+    } else if (key == Qt::Key_Escape) {
+        focused = -1;
     } else {
         auto check = key_map.find(key);
         if (check != key_map.end()) {

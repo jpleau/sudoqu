@@ -32,24 +32,15 @@ Game::Game(QObject *parent) : QTcpServer(parent) {
     current_id = 0;
 }
 
-void Game::start_game() {
+void Game::start_game(SB::Difficulty difficulty) {
     board.reset(new Sudoku);
-    board->generate();
+    board->generate(difficulty);
 
-    active = true;
-
-    QJsonObject obj;
-    obj["message"] = NEW_GAME;
-
-    std::vector<int> puzzle = board->getPuzzle();
-    std::list<QVariant> list(puzzle.begin(), puzzle.end());
-    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
-
-    QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
-    obj["board"] = array;
-
+    QJsonObject obj(sendBoard());
     sendMessageToAllPlayers(obj);
     sendReadyChange();
+
+    active = true;
 }
 
 void Game::start_server() {
@@ -146,6 +137,20 @@ bool Game::checkSolution(std::vector<int> &board_check) const {
     return board_check == solution;
 }
 
+QJsonObject Game::sendBoard() {
+    QJsonObject obj;
+    obj["message"] = NEW_GAME;
+
+    std::vector<int> puzzle = board->getPuzzle();
+    std::list<QVariant> list(puzzle.begin(), puzzle.end());
+    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
+
+    QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
+    obj["board"] = array;
+
+    return obj;
+}
+
 void Game::sendReadyChange(Player *except) {
     QJsonArray list_players;
     QJsonArray list_ready;
@@ -206,6 +211,11 @@ void Game::dataReceived() {
                     player->setName(name);
                     obj["message"] = NEW_PLAYER;
                     sendMessageToAllPlayers(obj);
+                }
+
+                if (active) {
+                    QJsonObject obj(sendBoard());
+                    sendMessageToPlayer(obj, player);
                 }
             } else if (message == CHAT_MESSAGE) {
                 obj["name"] = player->getName();
