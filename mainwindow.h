@@ -48,6 +48,7 @@ private:
     void connectPlayer();
     void disconnectPlayer();
     void closeEvent(QCloseEvent *);
+    void newBoard(std::vector<int> &);
 };
 }
 

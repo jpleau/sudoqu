@@ -31,19 +31,16 @@ class Sudoku {
 public:
     Sudoku();
     void generate(SB::Difficulty = SB::EASY);
-	const std::vector<int>& get_puzzle() const;
-	const std::vector<int>& get_solution() const
-	;
+    const std::vector<int> &get_puzzle() const;
+    const std::vector<int> &get_solution() const;
     void print();
 
 private:
     qqwing::SudokuBoard board;
-	
-	std::vector<int> puzzle;
-	std::vector<int> solution;
-	
-};
 
+    std::vector<int> puzzle;
+    std::vector<int> solution;
+};
 }
 
 #endif

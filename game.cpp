@@ -29,24 +29,24 @@
 namespace Sudoqu {
 
 Game::Game(QObject *parent) : QTcpServer(parent) {
-	current_id = 0;
+    current_id = 0;
 }
 
 void Game::start_game() {
-	board.reset(new Sudoku);
-	board->generate();
-	
-	QJsonObject obj;
-	obj["message"] = NEW_BOARD;
-	
-	std::vector<int> puzzle = board->get_puzzle();
-	std::list<QVariant> list(puzzle.begin(), puzzle.end());
-	QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
-	
-	QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
-	obj["board"] = array;
-	
-	sendMessageToAllPlayers(obj);
+    board.reset(new Sudoku);
+    board->generate();
+
+    QJsonObject obj;
+    obj["message"] = NEW_GAME;
+
+    std::vector<int> puzzle = board->get_puzzle();
+    std::list<QVariant> list(puzzle.begin(), puzzle.end());
+    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
+
+    QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
+    obj["board"] = array;
+
+    sendMessageToAllPlayers(obj);
 }
 
 void Game::start_server() {
@@ -63,7 +63,7 @@ void Game::stop_server() {
 
 void Game::clientConnected() {
     QTcpSocket *socket = nextPendingConnection();
-	socket->setParent(this);
+    socket->setParent(this);
 
     connect(socket, &QTcpSocket::readyRead, this, &Game::dataReceived);
 
@@ -71,10 +71,10 @@ void Game::clientConnected() {
 
     players[socket] = std::make_unique<Player>(socket);
 
-	Player* player = players[socket].get();
-	
-	player->setId(current_id);
-	
+    Player *player = players[socket].get();
+
+    player->setId(current_id);
+
     QJsonObject obj;
     obj["message"] = YOUR_ID;
     obj["id"] = current_id;
@@ -93,18 +93,18 @@ void Game::clientConnected() {
 void Game::clientDisconnected(QTcpSocket *socket) {
     Player *player = players[socket].get();
 
-	QJsonObject send;
-	send["message"] = DISCONNECT_OK;
-	sendMessageToPlayer(send, player);
-	
+    QJsonObject send;
+    send["message"] = DISCONNECT_OK;
+    sendMessageToPlayer(send, player);
+
     send = QJsonObject();
     send["message"] = DISCONNECT;
     send["name"] = player->getName();
 
     sendMessageToPlayersExcept(send, player);
-	
-	players.erase(socket);
-	
+
+    players.erase(socket);
+
     sendReadyChange(player);
 }
 
@@ -138,15 +138,15 @@ std::vector<Player *> Game::listPlayers(Player *exceptPlayer) {
     return ret;
 }
 
-void Game::sendReadyChange(Player* except) {
+void Game::sendReadyChange(Player *except) {
     QJsonArray list_players;
     QJsonArray list_ready;
 
     for (auto &p : players) {
-		if (p.second.get() != except) {
-			list_players.append(p.second->getName());
-	        list_ready.append(p.second->getReady());	
-		}
+        if (p.second.get() != except) {
+            list_players.append(p.second->getName());
+            list_ready.append(p.second->getReady());
+        }
     }
 
     QJsonObject send;

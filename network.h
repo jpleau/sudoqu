@@ -32,9 +32,9 @@ enum Messages : int {
     CHAT_MESSAGE,
     READY_CHANGE,
     DISCONNECT,
-	DISCONNECT_OK,
+    DISCONNECT_OK,
     SERVER_DOWN,
-	NEW_BOARD,
+    NEW_GAME,
 };
 
 void sendNetworkMessage(QJsonObject &, QTcpSocket *);

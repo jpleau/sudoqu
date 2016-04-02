@@ -21,11 +21,30 @@
 
 #include <QFrame>
 
+#include <vector>
+
 namespace Sudoqu {
 
 class GameFrame : public QFrame {
 public:
     GameFrame(QWidget * = nullptr);
+
+    void newBoard(std::vector<int>);
+
+    int getAt(int) const;
+    void setAt(int, int);
+
+    int getGivenAt(int) const;
+
+protected:
+    void paintEvent(QPaintEvent *) override;
+
+private:
+    bool active;
+    std::vector<int> board;
+    std::vector<int> given;
+
+    int focused;
 };
 }
 

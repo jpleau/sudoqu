@@ -50,9 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             me->disconnectFromServer();
         }
     });
-	connect(ui->start_game, &QPushButton::clicked, [=]() {
-		game->start_game();
-	});
+    connect(ui->start_game, &QPushButton::clicked, [=]() { game->start_game(); });
 }
 
 MainWindow::~MainWindow() {
@@ -90,7 +88,6 @@ void MainWindow::connectPlayer() {
             ui->chat_area->appendHtml(message);
         });
 
-		
         connect(me.get(), &Player::playerConnected, [=]() {
             ui->chat_send_button->setEnabled(true);
             connect(ui->chat_send_button, &QPushButton::clicked, this, &MainWindow::sendChatMessage);
@@ -118,13 +115,14 @@ void MainWindow::connectPlayer() {
             ui->chat_area->appendHtml(message);
         });
 
-		
+        connect(me.get(), &Player::receivedNewBoard, this, &MainWindow::newBoard);
+
         connect(ui->ready, &QCheckBox::clicked, [=](bool checked) { me->setReady(checked, true); });
     }
 }
 
 void MainWindow::disconnectPlayer() {
-	me.reset();
+    me.reset();
     ui->connect_server->setEnabled(true);
     ui->disconnect_server->setEnabled(false);
     ui->nickname->setEnabled(true);
@@ -135,7 +133,11 @@ void MainWindow::disconnectPlayer() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
-	// TODO: send disconnect
+    // TODO: send disconnect
+}
+
+void MainWindow::newBoard(std::vector<int> &board) {
+    ui->frame->newBoard(board);
 }
 
 void MainWindow::sendChatMessage() {

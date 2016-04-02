@@ -23,16 +23,15 @@
 
 namespace Sudoqu {
 
-void SocketDeleter::operator() (QTcpSocket *s) {
-	s->deleteLater();
+void SocketDeleter::operator()(QTcpSocket *s) {
+    s->deleteLater();
 }
 
-
 Player::Player(QTcpSocket *s) {
-	if (s == nullptr) {
-		s = new QTcpSocket;
-	}
-	socket = std::unique_ptr<QTcpSocket, SocketDeleter>(s,  SocketDeleter());
+    if (s == nullptr) {
+        s = new QTcpSocket;
+    }
+    socket = std::unique_ptr<QTcpSocket, SocketDeleter>(s, SocketDeleter());
 }
 
 void Player::connectToGame(QString host) {
@@ -107,7 +106,6 @@ void Player::clientDisconnected() {
 }
 
 void Player::dataReceived() {
-    bool disconnect = false;
     QString data;
     while (socket != nullptr && socket->canReadLine()) {
         data = socket->readLine();
@@ -142,18 +140,19 @@ void Player::dataReceived() {
                 emit otherPlayerDisconnected(name);
             } else if (message == DISCONNECT_OK || message == SERVER_DOWN) {
                 socket->disconnectFromHost();
-            } else if (message == NEW_BOARD) {
-				qDebug() << obj;
-			}
-        }
-    }
+            } else if (message == NEW_GAME) {
+                auto array = obj["board"].toArray();
+                std::vector<int> board;
+                for (int i = 0; i < array.size(); ++i) {
+                    board.push_back(array[i].toInt());
+                }
 
-    if (disconnect) {
-        socket->disconnectFromHost();
+                emit receivedNewBoard(board);
+            }
+        }
     }
 }
 
 void Player::socketError(QAbstractSocket::SocketError) {
-    // emit playerDisconnected();
 }
 }

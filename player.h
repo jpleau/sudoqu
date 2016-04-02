@@ -29,7 +29,7 @@
 namespace Sudoqu {
 
 struct SocketDeleter {
-	void operator() (QTcpSocket *);
+    void operator()(QTcpSocket *);
 };
 
 class Player : public QObject {
@@ -55,8 +55,8 @@ public:
 
     bool getReady() const;
     void setReady(bool, bool = false);
-	
-	void wait();
+
+    void wait();
 
 signals:
     void receivedNewPlayer(int, QString);
@@ -65,6 +65,7 @@ signals:
     void receivedChatMessage(QString, QString);
     void receivedReadyChanges(std::vector<std::tuple<QString, bool>> &);
     void otherPlayerDisconnected(QString);
+    void receivedNewBoard(std::vector<int> &);
 
 private:
     std::unique_ptr<QTcpSocket, SocketDeleter> socket;

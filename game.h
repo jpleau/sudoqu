@@ -40,18 +40,18 @@ public:
     Game(QObject * = nullptr);
     void start_server();
     void stop_server();
-	void start_game();
+    void start_game();
 
 private:
-	int current_id;
-	std::map<QTcpSocket*, std::shared_ptr<Player>> players;
-	std::unique_ptr<Sudoku> board;
-	
+    int current_id;
+    std::map<QTcpSocket *, std::shared_ptr<Player>> players;
+    std::unique_ptr<Sudoku> board;
+
     void sendMessageToPlayer(QJsonObject &, Player *);
     void sendMessageToAllPlayers(QJsonObject &);
     void sendMessageToPlayers(QJsonObject &, std::vector<Player *> &);
     void sendMessageToPlayersExcept(QJsonObject &, Player *);
-    void sendReadyChange(Player* = nullptr);
+    void sendReadyChange(Player * = nullptr);
     std::vector<Player *> listPlayers(Player * = nullptr);
 
 private slots:
@@ -59,7 +59,6 @@ private slots:
     void clientDisconnected(QTcpSocket *);
     void dataReceived();
 };
-
 }
 
 #endif
