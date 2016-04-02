@@ -34,6 +34,7 @@ enum Messages : int {
     DISCONNECT,
 	DISCONNECT_OK,
     SERVER_DOWN,
+	NEW_BOARD,
 };
 
 void sendNetworkMessage(QJsonObject &, QTcpSocket *);

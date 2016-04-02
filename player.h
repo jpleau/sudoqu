@@ -28,6 +28,10 @@
 
 namespace Sudoqu {
 
+struct SocketDeleter {
+	void operator() (QTcpSocket *);
+};
+
 class Player : public QObject {
     Q_OBJECT
 
@@ -63,7 +67,7 @@ signals:
     void otherPlayerDisconnected(QString);
 
 private:
-    std::unique_ptr<QTcpSocket> socket;
+    std::unique_ptr<QTcpSocket, SocketDeleter> socket;
     QString name;
     int id;
     bool ready = false;

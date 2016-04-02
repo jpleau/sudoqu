@@ -20,6 +20,7 @@
 #define GAME_H
 
 #include "player.h"
+#include "sudoku.h"
 
 #include <QTcpServer>
 #include <QJsonObject>
@@ -37,27 +38,28 @@ class Game : public QTcpServer {
 
 public:
     Game(QObject * = nullptr);
-    void start();
-    void stop();
+    void start_server();
+    void stop_server();
+	void start_game();
 
 private:
-    void clientConnected();
-    void clientDisconnected(QTcpSocket *);
-    void dataReceived();
-
+	int current_id;
+	std::map<QTcpSocket*, std::shared_ptr<Player>> players;
+	std::unique_ptr<Sudoku> board;
+	
     void sendMessageToPlayer(QJsonObject &, Player *);
     void sendMessageToAllPlayers(QJsonObject &);
     void sendMessageToPlayers(QJsonObject &, std::vector<Player *> &);
     void sendMessageToPlayersExcept(QJsonObject &, Player *);
     void sendReadyChange(Player* = nullptr);
-
     std::vector<Player *> listPlayers(Player * = nullptr);
-    int current_id;
-    std::map<QTcpSocket*, int> sockets;
-	std::map<int, std::shared_ptr<Player>> players;
-	
-	std::vector<int> to_delete;
+
+private slots:
+    void clientConnected();
+    void clientDisconnected(QTcpSocket *);
+    void dataReceived();
 };
+
 }
 
 #endif

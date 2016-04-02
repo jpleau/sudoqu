@@ -23,12 +23,16 @@
 
 namespace Sudoqu {
 
+void SocketDeleter::operator() (QTcpSocket *s) {
+	s->deleteLater();
+}
+
+
 Player::Player(QTcpSocket *s) {
-    if (s == nullptr) {
-        socket.reset(new QTcpSocket);
-    } else {
-        socket.reset(s);
-    }
+	if (s == nullptr) {
+		s = new QTcpSocket;
+	}
+	socket = std::unique_ptr<QTcpSocket, SocketDeleter>(s,  SocketDeleter());
 }
 
 void Player::connectToGame(QString host) {
@@ -136,13 +140,11 @@ void Player::dataReceived() {
             } else if (message == DISCONNECT) {
                 QString name = obj["name"].toString();
                 emit otherPlayerDisconnected(name);
-            } else if (message == DISCONNECT_OK) {
-                // socket->disconnectFromHost();
-                disconnect = true;
-
-            } else if (message == SERVER_DOWN) {
-                disconnect = true;
-            }
+            } else if (message == DISCONNECT_OK || message == SERVER_DOWN) {
+                socket->disconnectFromHost();
+            } else if (message == NEW_BOARD) {
+				qDebug() << obj;
+			}
         }
     }
 

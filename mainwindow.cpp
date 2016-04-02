@@ -29,12 +29,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->start_server, &QPushButton::clicked, [=]() {
         game.reset(new Game(this));
-        game->start();
+        game->start_server();
         ui->start_server->setEnabled(false);
         ui->stop_server->setEnabled(true);
         connect(ui->stop_server, &QPushButton::clicked, [=]() {
             if (game) {
-                game->stop();
+                game->stop_server();
                 game.reset();
             }
             ui->start_server->setEnabled(true);
@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             me->disconnectFromServer();
         }
     });
+	connect(ui->start_game, &QPushButton::clicked, [=]() {
+		game->start_game();
+	});
 }
 
 MainWindow::~MainWindow() {
@@ -121,6 +124,7 @@ void MainWindow::connectPlayer() {
 }
 
 void MainWindow::disconnectPlayer() {
+	me.reset();
     ui->connect_server->setEnabled(true);
     ui->disconnect_server->setEnabled(false);
     ui->nickname->setEnabled(true);
@@ -130,7 +134,8 @@ void MainWindow::disconnectPlayer() {
     ui->player_list->clear();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::closeEvent(QCloseEvent *) {
+	// TODO: send disconnect
 }
 
 void MainWindow::sendChatMessage() {

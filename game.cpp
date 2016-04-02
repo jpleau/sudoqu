@@ -29,15 +29,32 @@
 namespace Sudoqu {
 
 Game::Game(QObject *parent) : QTcpServer(parent) {
-    current_id = 0;
+	current_id = 0;
 }
 
-void Game::start() {
+void Game::start_game() {
+	board.reset(new Sudoku);
+	board->generate();
+	
+	QJsonObject obj;
+	obj["message"] = NEW_BOARD;
+	
+	std::vector<int> puzzle = board->get_puzzle();
+	std::list<QVariant> list(puzzle.begin(), puzzle.end());
+	QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
+	
+	QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
+	obj["board"] = array;
+	
+	sendMessageToAllPlayers(obj);
+}
+
+void Game::start_server() {
     listen(QHostAddress::AnyIPv4, 19770);
     connect(this, &QTcpServer::newConnection, this, &Game::clientConnected);
 }
 
-void Game::stop() {
+void Game::stop_server() {
     QJsonObject obj;
     obj["message"] = SERVER_DOWN;
 
@@ -52,10 +69,10 @@ void Game::clientConnected() {
 
     ++current_id;
 
-	sockets[socket] = current_id;
-    players[current_id] = std::make_unique<Player>(socket);
+    players[socket] = std::make_unique<Player>(socket);
 
-	Player* player = players[current_id].get();
+	Player* player = players[socket].get();
+	
 	player->setId(current_id);
 	
     QJsonObject obj;
@@ -74,22 +91,21 @@ void Game::clientConnected() {
 }
 
 void Game::clientDisconnected(QTcpSocket *socket) {
-	int id = sockets[socket];
-    auto player = players[id];
+    Player *player = players[socket].get();
 
 	QJsonObject send;
 	send["message"] = DISCONNECT_OK;
-	sendMessageToPlayer(send, player.get());
+	sendMessageToPlayer(send, player);
 	
-	player->wait();
-	
-    QJsonObject send2;
-    send2["message"] = DISCONNECT;
-    send2["name"] = player->getName();
+    send = QJsonObject();
+    send["message"] = DISCONNECT;
+    send["name"] = player->getName();
 
-    sendMessageToPlayersExcept(send2, player.get());
-	to_delete.push_back(id);
-    sendReadyChange(player.get());
+    sendMessageToPlayersExcept(send, player);
+	
+	players.erase(socket);
+	
+    sendReadyChange(player);
 }
 
 void Game::sendMessageToPlayer(QJsonObject &obj, Player *player) {
@@ -142,8 +158,7 @@ void Game::sendReadyChange(Player* except) {
 
 void Game::dataReceived() {
     QTcpSocket *socket = static_cast<QTcpSocket *>(this->sender());
-	int id = sockets[socket];
-    Player *player = players[id].get();
+    Player *player = players[socket].get();
     QString data;
     while (socket && socket->canReadLine()) {
         data = socket->readLine();
@@ -170,9 +185,5 @@ void Game::dataReceived() {
             }
         }
     }
-	
-	for (int i : to_delete) {
-		players.erase(i);
-	}
 }
 }
