@@ -254,7 +254,7 @@
   <customwidget>
    <class>Sudoqu::GameFrame</class>
    <extends>QFrame</extends>
-   <header>gameframe.h</header>
+   <header>src/gameframe.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
