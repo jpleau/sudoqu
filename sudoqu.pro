@@ -26,5 +26,10 @@ HEADERS  += src/mainwindow.h \
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui
 
+
+VERSION = "0.0.1"
+
+DEFINES += VERSION=\\\"$$VERSION\\\"
+
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing

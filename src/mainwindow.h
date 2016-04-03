@@ -45,13 +45,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    void keyPressEvent(QKeyEvent *) override;
+
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<Game> game;
     std::unique_ptr<Player> me;
 
     void sendChatMessage();
-    void connectPlayer();
     void disconnectPlayer();
     void closeEvent(QCloseEvent *);
     void newBoard(std::vector<int> &);
@@ -62,14 +64,20 @@ private:
     void connectToServer(QString host);
     void changeName();
 
+    // Konami code
+    int konamiCount = 0;
+    QList<Qt::Key> konamiKeys;
+
     // Menu
-    std::unique_ptr<QMenu> newGameMenu;
     std::unique_ptr<QActionGroup> newGameGroup;
     std::unique_ptr<QAction> hostGameAction;
     std::unique_ptr<QAction> connectGameAction;
     std::unique_ptr<QAction> quitAction;
     std::unique_ptr<QAction> stopServerAction;
     std::unique_ptr<QAction> disconnectAction;
+    std::unique_ptr<QActionGroup> aboutGroup;
+    std::unique_ptr<QAction> aboutAction;
+    std::unique_ptr<QAction> aboutQtAction;
 };
 }
 

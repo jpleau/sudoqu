@@ -24,6 +24,8 @@
 #include "game.h"
 #include "player.h"
 
+#include <QMessageBox>
+
 namespace Sudoqu {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -50,19 +52,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->nick_change, &QPushButton::clicked, this, &MainWindow::changeName);
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::changeName);
-
-    connect(ui->cheat, &QPushButton::clicked, ui->frame, &GameFrame::cheat);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    if (konamiCount < konamiKeys.size()) {
+        if (konamiKeys[konamiCount] == event->key()) {
+            ++konamiCount;
+        } else {
+            konamiCount = 0;
+        }
+
+        if (konamiCount >= konamiKeys.size()) {
+            ui->frame->repaint();
+        }
+    }
+
+    if (event->key() == Qt::Key_L) {
+        auto modifiers = event->modifiers();
+        if (modifiers & Qt::AltModifier && modifiers & Qt::ControlModifier) {
+            ui->frame->cheat();
+        }
+    }
+}
+
 void MainWindow::disconnectPlayer() {
     me.reset();
     disconnectAction->setEnabled(false);
     ui->nickname->setEnabled(true);
-    ui->cheat->setEnabled(false);
     ui->start_game->setEnabled(false);
     ui->difficulty->setEnabled(false);
     ui->chat_area->clear();
@@ -78,18 +98,16 @@ void MainWindow::closeEvent(QCloseEvent *) {
 
 void MainWindow::newBoard(std::vector<int> &board) {
     ui->frame->newBoard(board);
-    ui->cheat->setEnabled(true);
 }
 
 void MainWindow::setupMenu() {
-    newGameMenu = std::make_unique<QMenu>("New game");
-    ui->menuGame->addMenu(newGameMenu.get());
-
     newGameGroup = std::make_unique<QActionGroup>(this);
 
     hostGameAction = std::make_unique<QAction>("Host a game", newGameGroup.get());
+    hostGameAction->setShortcut(QKeySequence::New);
     connectGameAction = std::make_unique<QAction>("Connect to a game", newGameGroup.get());
-    newGameMenu->addActions(newGameGroup->actions());
+    connectGameAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_N);
+    ui->menuGame->addActions(newGameGroup->actions());
 
     ui->menuGame->addSeparator();
 
@@ -107,6 +125,11 @@ void MainWindow::setupMenu() {
     quitAction->setShortcut(Qt::ALT | Qt::Key_F4);
     ui->menuGame->addAction(quitAction.get());
 
+    aboutGroup = std::make_unique<QActionGroup>(this);
+    aboutAction = std::make_unique<QAction>("About", aboutGroup.get());
+    aboutQtAction = std::make_unique<QAction>("About Qt", aboutGroup.get());
+    ui->menuHelp->addActions(aboutGroup->actions());
+
     connect(quitAction.get(), &QAction::triggered, this, &MainWindow::close);
 
     connect(hostGameAction.get(), &QAction::triggered, [=]() { setupNewGame(NewGameType::HOST); });
@@ -114,6 +137,34 @@ void MainWindow::setupMenu() {
 
     connect(disconnectAction.get(), &QAction::triggered, this, &MainWindow::disconnectPlayer);
     connect(stopServerAction.get(), &QAction::triggered, this, &MainWindow::stopServer);
+
+    connect(aboutAction.get(), &QAction::triggered, [=]() {
+        QString aboutTitle("<h3>About Sudoqu (Version %1)</h3>"
+                           "<p>Single / Multiplayer Sudoku</p>");
+
+        aboutTitle = aboutTitle.arg(QCoreApplication::applicationVersion());
+
+        QString aboutMsg("<p>Copyright 2016 Jason Pleau <a href=\"mailto:jason@jpleau.ca\">jason@jpleau.ca</a></p>"
+                         "<p>This program is free software: you can redistribute it and/or modify"
+                         "it under the terms of the GNU General Public License as published by"
+                         "the Free Software Foundation, either version 3 of the License, or"
+                         "(at your option) any later version.</p>"
+
+                         "<p>This program is distributed in the hope that it will be useful,"
+                         "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+                         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
+                         "GNU General Public License for more details.</p>"
+
+                         "<p>You should have received a copy of the GNU General Public License"
+                         "along with this program.  If not, see <a "
+                         "href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p>");
+        QMessageBox msgBox(this);
+        msgBox.setText(aboutTitle);
+        msgBox.setInformativeText(aboutMsg);
+        msgBox.exec();
+    });
+
+    connect(aboutQtAction.get(), &QAction::triggered, QApplication::aboutQt);
 }
 
 void MainWindow::setupNewGame(NewGameType type) {

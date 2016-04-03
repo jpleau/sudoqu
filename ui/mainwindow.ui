@@ -132,16 +132,6 @@
           </layout>
          </item>
          <item>
-          <widget class="QPushButton" name="cheat">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Cheat</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="Sudoqu::GameFrame" name="frame">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -236,7 +226,13 @@
      <string>Game</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
    <addaction name="menuGame"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionNew_game">
    <property name="text">
