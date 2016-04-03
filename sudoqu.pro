@@ -6,22 +6,22 @@ TARGET = sudoqu
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    gameframe.cpp \
-    game.cpp \
-    player.cpp \
-    sudoku.cpp \
-    network.cpp \
-    connectdialog.cpp
+SOURCES +=  src/main.cpp\
+            src/mainwindow.cpp \
+            src/gameframe.cpp \
+            src/game.cpp \
+            src/player.cpp \
+            src/sudoku.cpp \
+            src/network.cpp \
+            src/connectdialog.cpp
 
-HEADERS  += mainwindow.h \
-    gameframe.h \
-    game.h \
-    player.h \
-    sudoku.h \
-    network.h \
-    connectdialog.h
+HEADERS  += src/mainwindow.h \
+            src/gameframe.h \
+            src/game.h \
+            src/player.h \
+            src/sudoku.h \
+            src/network.h \
+            src/connectdialog.h
 
 FORMS    += mainwindow.ui \
     connectdialog.ui
