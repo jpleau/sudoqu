@@ -12,16 +12,19 @@ SOURCES += main.cpp\
     game.cpp \
     player.cpp \
     sudoku.cpp \
-    network.cpp
+    network.cpp \
+    connectdialog.cpp
 
 HEADERS  += mainwindow.h \
     gameframe.h \
     game.h \
     player.h \
     sudoku.h \
-    network.h
+    network.h \
+    connectdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    connectdialog.ui
 
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing

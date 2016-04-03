@@ -17,6 +17,8 @@
  */
 
 #include "mainwindow.h"
+#include "connectdialog.h"
+
 #include "ui_mainwindow.h"
 
 #include "game.h"
@@ -125,6 +127,15 @@ void MainWindow::setupNewGame(NewGameType type) {
     if (type == HOST) {
         bool acceptConnections = true;
         startServer(acceptConnections);
+    }
+
+    if (type == CONNECT) {
+        ConnectDialog dialog;
+        if (dialog.exec() == QDialog::Accepted) {
+            host = dialog.getHost();
+        } else {
+            return;
+        }
     }
 
     connectToServer(host);
