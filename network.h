@@ -26,17 +26,18 @@ class QTcpSocket;
 namespace Sudoqu {
 
 enum Messages : int {
-    NEW_PLAYER = 1,
-    YOUR_ID,
-    SEND_NAME,
     CHAT_MESSAGE,
-    READY_CHANGE,
+    CHANGE_NAME,
     DISCONNECT,
     DISCONNECT_OK,
-    SERVER_DOWN,
+    NEW_PLAYER,
     NEW_GAME,
     NEW_COUNT,
+    STATUS_CHANGE,
+    SEND_NAME,
+    SERVER_DOWN,
     TEST_SOLUTION,
+    YOUR_ID,
 };
 
 void sendNetworkMessage(QJsonObject &, QTcpSocket *);

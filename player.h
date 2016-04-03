@@ -34,12 +34,11 @@ struct SocketDeleter {
     void operator()(QTcpSocket *);
 };
 
-struct ReadyChange {
+struct StatusChange {
     bool done;
-    bool ready;
     int count;
     QString name;
-    ReadyChange(bool, bool, int, QString);
+    StatusChange(bool, int, QString);
 };
 
 class Player : public QObject {
@@ -63,9 +62,6 @@ public:
         return socket.get();
     }
 
-    bool getReady() const;
-    void setReady(bool, bool = false);
-
     void sendCount(int);
 
     void setDone(bool);
@@ -73,20 +69,22 @@ public:
 
     void testBoard(std::vector<int> &, int);
 
+    void changeName(QString);
+
 signals:
     void receivedNewPlayer(int, QString);
     void playerConnected();
     void playerDisconnected();
     void receivedChatMessage(QString, QString);
-    void receivedReadyChanges(std::vector<ReadyChange> &, int);
+    void receivedStatusChanges(std::vector<StatusChange> &, int);
     void otherPlayerDisconnected(QString);
     void receivedNewBoard(std::vector<int> &);
+    void otherPlayerChangedName(int, QString, QString);
 
 private:
     int id;
     QString name;
     std::unique_ptr<QTcpSocket, SocketDeleter> socket;
-    bool ready = false;
     bool done = false;
 
     void sendMessage(QJsonObject &);

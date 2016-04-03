@@ -66,20 +66,6 @@ void Player::sendChatMessage(QString msg) {
     sendMessage(obj);
 }
 
-bool Player::getReady() const {
-    return ready;
-}
-
-void Player::setReady(bool r, bool send) {
-    ready = r;
-    if (send) {
-        QJsonObject obj;
-        obj["message"] = READY_CHANGE;
-        obj["ready"] = ready;
-        sendMessage(obj);
-    }
-}
-
 void Player::sendCount(int n) {
     QJsonObject obj;
     obj["message"] = NEW_COUNT;
@@ -127,6 +113,14 @@ void Player::testBoard(std::vector<int> &board, int count) {
     sendMessage(obj);
 }
 
+void Player::changeName(QString new_name) {
+    QJsonObject obj;
+    obj["message"] = CHANGE_NAME;
+    obj["old_name"] = this->name;
+    obj["new_name"] = new_name;
+    sendMessage(obj);
+}
+
 void Player::dataReceived() {
     QString data;
     while (socket != nullptr && socket->canReadLine()) {
@@ -141,7 +135,6 @@ void Player::dataReceived() {
                 send["id"] = id;
                 send["name"] = name;
                 sendMessage(send);
-                setReady(ready, true);
             } else if (message == NEW_PLAYER) {
                 int id = obj["id"].toInt();
                 QString name = obj["name"].toString();
@@ -150,21 +143,20 @@ void Player::dataReceived() {
                 QString text = obj["text"].toString();
                 QString name = obj["name"].toString();
                 emit receivedChatMessage(name, text);
-            } else if (message == READY_CHANGE) {
+            } else if (message == STATUS_CHANGE) {
                 int size = obj["players"].toArray().size();
                 int count_total = obj["count_total"].toInt();
-                std::vector<ReadyChange> list;
+                std::vector<StatusChange> list;
 
                 auto players = obj["players"].toArray();
-                auto ready = obj["ready"].toArray();
                 auto counts = obj["counts"].toArray();
                 auto done = obj["done"].toArray();
 
                 for (int i = 0; i < size; ++i) {
-                    list.emplace_back(done[i].toBool(), ready[i].toBool(), counts[i].toInt(), players[i].toString());
+                    list.emplace_back(done[i].toBool(), counts[i].toInt(), players[i].toString());
                 }
 
-                emit receivedReadyChanges(list, count_total);
+                emit receivedStatusChanges(list, count_total);
             } else if (message == DISCONNECT) {
                 QString name = obj["name"].toString();
                 emit otherPlayerDisconnected(name);
@@ -176,13 +168,14 @@ void Player::dataReceived() {
                 for (int i = 0; i < array.size(); ++i) {
                     board.push_back(array[i].toInt());
                 }
-
                 emit receivedNewBoard(board);
+            } else if (message == CHANGE_NAME) {
+                emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
             }
         }
     }
 }
 
-ReadyChange::ReadyChange(bool d, bool r, int c, QString n) : done(d), ready(r), count(c), name(n) {
+StatusChange::StatusChange(bool d, int c, QString n) : done(d), count(c), name(n) {
 }
 }

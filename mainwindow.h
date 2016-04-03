@@ -19,6 +19,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QActionGroup>
 #include <QMainWindow>
 
 #include <memory>
@@ -28,6 +29,11 @@ class MainWindow;
 }
 
 namespace Sudoqu {
+
+enum NewGameType : int {
+    CONNECT,
+    HOST,
+};
 
 class Game;
 class Player;
@@ -49,7 +55,22 @@ private:
     void disconnectPlayer();
     void closeEvent(QCloseEvent *);
     void newBoard(std::vector<int> &);
+    void setupMenu();
+    void setupNewGame(NewGameType);
+    void startServer(bool);
+    void stopServer();
+    void connectToServer(QString host);
+    void changeName();
+
+    // Menu
+    std::unique_ptr<QMenu> newGameMenu;
+    std::unique_ptr<QActionGroup> newGameGroup;
+    std::unique_ptr<QAction> hostGameAction;
+    std::unique_ptr<QAction> connectGameAction;
+    std::unique_ptr<QAction> quitAction;
+    std::unique_ptr<QAction> stopServerAction;
+    std::unique_ptr<QAction> disconnectAction;
 };
 }
 
-#endif // MAINWINDOW_H
+#endif

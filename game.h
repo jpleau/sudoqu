@@ -38,7 +38,7 @@ class Game : public QTcpServer {
 
 public:
     Game(QObject * = nullptr);
-    void start_server();
+    void start_server(bool);
     void stop_server();
     void start_game(SB::Difficulty);
 
@@ -53,7 +53,7 @@ private:
     void sendMessageToAllPlayers(QJsonObject &);
     void sendMessageToPlayers(QJsonObject &, std::vector<Player *> &);
     void sendMessageToPlayersExcept(QJsonObject &, Player *);
-    void sendReadyChange(Player * = nullptr);
+    void sendStatusChanges(Player * = nullptr);
     std::vector<Player *> listPlayers(Player * = nullptr);
     std::map<int, int> counts;
     bool checkSolution(std::vector<int> &) const;

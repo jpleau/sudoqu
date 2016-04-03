@@ -38,13 +38,19 @@ void Game::start_game(SB::Difficulty difficulty) {
 
     QJsonObject obj(sendBoard());
     sendMessageToAllPlayers(obj);
-    sendReadyChange();
+    sendStatusChanges();
 
     active = true;
 }
 
-void Game::start_server() {
-    listen(QHostAddress::AnyIPv4, 19770);
+void Game::start_server(bool acceptRemote) {
+    QHostAddress host = QHostAddress::AnyIPv4;
+
+    if (!acceptRemote) {
+        host = QHostAddress::LocalHost;
+    }
+
+    listen(host, 19770);
     connect(this, &QTcpServer::newConnection, this, &Game::clientConnected);
 }
 
@@ -99,7 +105,7 @@ void Game::clientDisconnected(QTcpSocket *socket) {
 
     players.erase(socket);
 
-    sendReadyChange(player);
+    sendStatusChanges(player);
 }
 
 void Game::sendMessageToPlayer(QJsonObject &obj, Player *player) {
@@ -151,7 +157,7 @@ QJsonObject Game::sendBoard() {
     return obj;
 }
 
-void Game::sendReadyChange(Player *except) {
+void Game::sendStatusChanges(Player *except) {
     QJsonArray list_players;
     QJsonArray list_ready;
     QJsonArray list_count;
@@ -175,7 +181,6 @@ void Game::sendReadyChange(Player *except) {
     for (auto &p : players) {
         if (p.second.get() != except) {
             list_players.append(p.second->getName());
-            list_ready.append(p.second->getReady());
             if (active) {
                 list_count.append(counts[p.second->getId()]);
                 list_done.append(p.second->isDone());
@@ -185,9 +190,8 @@ void Game::sendReadyChange(Player *except) {
         }
     }
 
-    send["message"] = READY_CHANGE;
+    send["message"] = STATUS_CHANGE;
     send["players"] = list_players;
-    send["ready"] = list_ready;
     send["counts"] = list_count;
     send["done"] = list_done;
 
@@ -220,15 +224,12 @@ void Game::dataReceived() {
             } else if (message == CHAT_MESSAGE) {
                 obj["name"] = player->getName();
                 sendMessageToPlayersExcept(obj, player);
-            } else if (message == READY_CHANGE) {
-                player->setReady(obj["ready"].toBool());
-                sendReadyChange();
             } else if (message == DISCONNECT) {
                 clientDisconnected(socket);
             } else if (message == NEW_COUNT) {
                 int count = obj["count"].toInt();
                 counts[player->getId()] = count;
-                sendReadyChange();
+                sendStatusChanges();
             } else if (message == TEST_SOLUTION) {
                 QJsonArray array = obj["board"].toArray();
                 std::vector<int> board;
@@ -237,7 +238,13 @@ void Game::dataReceived() {
                     board.push_back(array[i].toInt());
                 }
                 player->setDone(checkSolution(board));
-                sendReadyChange();
+                sendStatusChanges();
+            } else if (message == CHANGE_NAME) {
+                QString new_name = obj["new_name"].toString();
+                player->setName(new_name);
+                obj["id"] = player->getId();
+                sendMessageToAllPlayers(obj);
+                sendStatusChanges();
             }
         }
     }
