@@ -23,8 +23,8 @@ HEADERS  += src/mainwindow.h \
             src/network.h \
             src/connectdialog.h
 
-FORMS    += mainwindow.ui \
-    connectdialog.ui
+FORMS    += ui/mainwindow.ui \
+            ui/connectdialog.ui
 
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing
