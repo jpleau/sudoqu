@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setupMenu();
 
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::changeName);
+    connect(ui->nickname_change, &QToolButton::clicked, this, &MainWindow::changeName);
     connect(ui->clear_fields, &QPushButton::clicked, ui->frame, &GameFrame::clearBoard);
 }
 
@@ -165,6 +166,7 @@ void MainWindow::setupNewGame(NewGameType type) {
     if (ui->nickname->text().trimmed().isEmpty()) {
         ui->nickname->setStyleSheet("QLineEdit { background-color: #cc0000; color: #fff; }");
         ui->nickname->setFocus();
+        return;
     }
 
     QString host = "localhost";
