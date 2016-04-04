@@ -44,6 +44,8 @@ public:
 
     void cheat();
 
+    void clearBoard();
+
 signals:
     void setCount(int);
     void completeBoard(std::vector<int> &, int);

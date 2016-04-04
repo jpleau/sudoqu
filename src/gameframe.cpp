@@ -77,6 +77,13 @@ void GameFrame::cheat() {
     repaint();
 }
 
+void GameFrame::clearBoard() {
+    board = given;
+    focused = -1;
+    sendData();
+    repaint();
+}
+
 void GameFrame::paintEvent(QPaintEvent *) {
     if (!active) {
         return;

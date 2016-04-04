@@ -63,6 +63,7 @@ private:
     void stopServer();
     void connectToServer(QString host);
     void changeName();
+    void clearChat();
 
     // Konami code
     int konamiCount = 0;

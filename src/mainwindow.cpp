@@ -45,13 +45,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->difficulty->addItem("Intermedia", SB::INTERMEDIATE);
     ui->difficulty->addItem("Expert", SB::EXPERT);
 
-    ui->start_game->setVisible(false);
-    ui->difficulty->setVisible(false);
+    ui->start_game->setEnabled(false);
+    ui->difficulty->setEnabled(false);
 
     setupMenu();
 
-    connect(ui->nick_change, &QPushButton::clicked, this, &MainWindow::changeName);
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::changeName);
+    connect(ui->clear_fields, &QPushButton::clicked, ui->frame, &GameFrame::clearBoard);
 }
 
 MainWindow::~MainWindow() {
@@ -88,6 +88,8 @@ void MainWindow::disconnectPlayer() {
     ui->chat_area->clear();
     ui->player_list->clear();
     ui->frame->stop();
+    ui->clear_chat->setEnabled(true);
+    ui->clear_fields->setEnabled(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
@@ -201,8 +203,8 @@ void MainWindow::startServer(bool acceptConnections) {
 
     });
     stopServerAction->setEnabled(true);
-    ui->start_game->setVisible(true);
-    ui->difficulty->setVisible(true);
+    ui->start_game->setEnabled(true);
+    ui->difficulty->setEnabled(true);
 }
 
 void MainWindow::stopServer() {
@@ -211,8 +213,6 @@ void MainWindow::stopServer() {
         game.reset();
     }
     stopServerAction->setEnabled(false);
-    ui->start_game->setVisible(false);
-    ui->difficulty->setVisible(false);
     ui->start_game->setEnabled(false);
     ui->difficulty->setEnabled(false);
 }
@@ -236,6 +236,8 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::playerConnected, [=]() {
         ui->chat_send_button->setEnabled(true);
+        ui->clear_chat->setEnabled(true);
+        ui->clear_fields->setEnabled(true);
         connect(ui->chat_send_button, &QPushButton::clicked, this, &MainWindow::sendChatMessage);
         connect(ui->chat_text, &QLineEdit::returnPressed, this, &MainWindow::sendChatMessage);
     });
@@ -279,8 +281,10 @@ void MainWindow::connectToServer(QString host) {
                 QString(R"(<strong>%1</strong> changed name to <strong>%2</strong><br/>)").arg(old_name).arg(new_name);
         }
         ui->chat_area->appendHtml(msg);
-
     });
+
+    connect(ui->clear_chat, &QPushButton::clicked, this, &MainWindow::clearChat);
+
     connect(me.get(), &Player::receivedNewBoard, this, &MainWindow::newBoard);
 
     connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
@@ -302,7 +306,7 @@ void MainWindow::sendChatMessage() {
     ui->chat_text->clear();
 
     if (send == "/clear") {
-        ui->chat_area->clear();
+        clearChat();
         return;
     }
 
@@ -311,5 +315,9 @@ void MainWindow::sendChatMessage() {
         QString message = QString("<strong>You: </strong> %1").arg(send);
         ui->chat_area->appendHtml(message);
     }
+}
+
+void MainWindow::clearChat() {
+    ui->chat_area->clear();
 }
 }

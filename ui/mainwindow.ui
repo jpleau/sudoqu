@@ -90,13 +90,6 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QPushButton" name="nick_change">
-                <property name="text">
-                 <string>OK</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
@@ -112,7 +105,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Start Game</string>
+              <string>New puzzle</string>
              </property>
             </widget>
            </item>
@@ -126,6 +119,16 @@
                <horstretch>1</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clear_fields">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Clear fields</string>
              </property>
             </widget>
            </item>
@@ -159,9 +162,12 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QPushButton" name="clear_chat">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Players :</string>
+           <string>Clear chat</string>
           </property>
          </widget>
         </item>
@@ -201,6 +207,9 @@
             </property>
             <property name="text">
              <string>Send</string>
+            </property>
+            <property name="default">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
