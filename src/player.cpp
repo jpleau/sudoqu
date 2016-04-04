@@ -117,7 +117,7 @@ void Player::changeName(QString new_name) {
     QJsonObject obj;
     obj["message"] = CHANGE_NAME;
     obj["old_name"] = this->name;
-    obj["new_name"] = new_name;
+    obj["new_name"] = new_name.toHtmlEscaped();
     sendMessage(obj);
 }
 
@@ -136,7 +136,7 @@ void Player::dataReceived() {
                     QJsonObject send;
                     send["message"] = SEND_NAME;
                     send["id"] = id;
-                    send["name"] = name;
+                    send["name"] = name.toHtmlEscaped();
                     sendMessage(send);
                 }
                 break;

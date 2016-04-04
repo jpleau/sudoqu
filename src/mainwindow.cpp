@@ -298,7 +298,7 @@ void MainWindow::changeName() {
 }
 
 void MainWindow::sendChatMessage() {
-    QString send = ui->chat_text->text().trimmed();
+    QString send = ui->chat_text->text().trimmed().toHtmlEscaped();
     ui->chat_text->clear();
 
     if (send == "/clear") {
