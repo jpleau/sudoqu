@@ -128,49 +128,62 @@ void Player::dataReceived() {
         QJsonObject obj = readNetworkMessage(data);
         if (obj.contains("message")) {
             int message = obj["message"].toInt();
-            if (message == YOUR_ID) {
-                this->setId(obj["id"].toInt());
-                QJsonObject send;
-                send["message"] = SEND_NAME;
-                send["id"] = id;
-                send["name"] = name;
-                sendMessage(send);
-            } else if (message == NEW_PLAYER) {
-                int id = obj["id"].toInt();
-                QString name = obj["name"].toString();
-                emit receivedNewPlayer(id, name);
-            } else if (message == CHAT_MESSAGE) {
-                QString text = obj["text"].toString();
-                QString name = obj["name"].toString();
-                emit receivedChatMessage(name, text);
-            } else if (message == STATUS_CHANGE) {
-                int size = obj["players"].toArray().size();
-                int count_total = obj["count_total"].toInt();
-                std::vector<StatusChange> list;
 
+            switch (message) {
+            case YOUR_ID:
+                this->setId(obj["id"].toInt());
+                {
+                    QJsonObject send;
+                    send["message"] = SEND_NAME;
+                    send["id"] = id;
+                    send["name"] = name;
+                    sendMessage(send);
+                }
+                break;
+
+            case NEW_PLAYER:
+                emit receivedNewPlayer(obj["id"].toInt(), obj["name"].toString());
+                break;
+
+            case CHAT_MESSAGE:
+                emit receivedChatMessage(obj["name"].toString(), obj["text"].toString());
+                break;
+
+            case STATUS_CHANGE: {
+                std::vector<StatusChange> list;
                 auto players = obj["players"].toArray();
                 auto counts = obj["counts"].toArray();
                 auto done = obj["done"].toArray();
 
-                for (int i = 0; i < size; ++i) {
+                for (int i = 0; i < obj["players"].toArray().size(); ++i) {
                     list.emplace_back(done[i].toBool(), counts[i].toInt(), players[i].toString());
                 }
 
-                emit receivedStatusChanges(list, count_total);
-            } else if (message == DISCONNECT) {
-                QString name = obj["name"].toString();
-                emit otherPlayerDisconnected(name);
-            } else if (message == DISCONNECT_OK || message == SERVER_DOWN) {
+                emit receivedStatusChanges(list, obj["count_total"].toInt());
+                break;
+            }
+
+            case DISCONNECT:
+                emit otherPlayerDisconnected(obj["name"].toString());
+                break;
+
+            case DISCONNECT_OK:
+            case SERVER_DOWN:
                 socket->disconnectFromHost();
-            } else if (message == NEW_GAME) {
+                break;
+
+            case NEW_GAME: {
                 auto array = obj["board"].toArray();
                 std::vector<int> board;
                 for (int i = 0; i < array.size(); ++i) {
                     board.push_back(array[i].toInt());
                 }
                 emit receivedNewBoard(board);
-            } else if (message == CHANGE_NAME) {
+                break;
+            }
+            case CHANGE_NAME:
                 emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
+                break;
             }
         }
     }

@@ -38,9 +38,10 @@ void Game::start_game(SB::Difficulty difficulty) {
 
     QJsonObject obj(sendBoard());
     sendMessageToAllPlayers(obj);
-    sendStatusChanges();
 
     active = true;
+
+    sendStatusChanges();
 }
 
 void Game::start_server(bool acceptRemote) {
@@ -209,10 +210,10 @@ void Game::dataReceived() {
             int id = obj["id"].toInt();
             int message = obj["message"].toInt();
 
-            if (message == SEND_NAME) {
-                QString name = obj["name"].toString();
+            switch (message) {
+            case SEND_NAME:
                 if (id == player->getId()) {
-                    player->setName(name);
+                    player->setName(obj["name"].toString());
                     obj["message"] = NEW_PLAYER;
                     sendMessageToAllPlayers(obj);
                 }
@@ -223,16 +224,22 @@ void Game::dataReceived() {
                 }
 
                 sendStatusChanges();
-            } else if (message == CHAT_MESSAGE) {
+                break;
+            case CHAT_MESSAGE:
                 obj["name"] = player->getName();
                 sendMessageToPlayersExcept(obj, player);
-            } else if (message == DISCONNECT) {
+                break;
+
+            case DISCONNECT:
                 clientDisconnected(socket);
-            } else if (message == NEW_COUNT) {
-                int count = obj["count"].toInt();
-                counts[player->getId()] = count;
+                break;
+
+            case NEW_COUNT:
+                counts[player->getId()] = obj["count"].toInt();
                 sendStatusChanges();
-            } else if (message == TEST_SOLUTION) {
+                break;
+
+            case TEST_SOLUTION: {
                 QJsonArray array = obj["board"].toArray();
                 std::vector<int> board;
                 counts[player->getId()] = obj["count"].toInt();
@@ -241,12 +248,15 @@ void Game::dataReceived() {
                 }
                 player->setDone(checkSolution(board));
                 sendStatusChanges();
-            } else if (message == CHANGE_NAME) {
-                QString new_name = obj["new_name"].toString();
-                player->setName(new_name);
+                break;
+            }
+
+            case CHANGE_NAME:
+                player->setName(obj["new_name"].toString());
                 obj["id"] = player->getId();
                 sendMessageToAllPlayers(obj);
                 sendStatusChanges();
+                break;
             }
         }
     }
