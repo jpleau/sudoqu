@@ -13,7 +13,8 @@ SOURCES +=  src/main.cpp\
             src/player.cpp \
             src/sudoku.cpp \
             src/network.cpp \
-            src/connectdialog.cpp
+            src/connectdialog.cpp \
+            src/chatbox.cpp
 
 HEADERS  += src/mainwindow.h \
             src/gameframe.h \
@@ -21,7 +22,8 @@ HEADERS  += src/mainwindow.h \
             src/player.h \
             src/sudoku.h \
             src/network.h \
-            src/connectdialog.h
+            src/connectdialog.h \
+            src/chatbox.h
 
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui

@@ -194,7 +194,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="chat_text">
+           <widget class="Sudoqu::ChatBox" name="chat_text">
             <property name="placeholderText">
              <string>Chat</string>
             </property>
@@ -261,6 +261,11 @@
    <extends>QFrame</extends>
    <header>src/gameframe.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Sudoqu::ChatBox</class>
+   <extends>QLineEdit</extends>
+   <header>src/chatbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

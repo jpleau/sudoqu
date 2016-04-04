@@ -320,4 +320,5 @@ void MainWindow::sendChatMessage() {
 void MainWindow::clearChat() {
     ui->chat_area->clear();
 }
+
 }
