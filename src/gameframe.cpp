@@ -30,6 +30,7 @@ GameFrame::GameFrame(QWidget *parent) : QFrame(parent), active(false) {
 }
 
 void GameFrame::newBoard(std::vector<int> b) {
+    focused = -1;
     board = b;
     given = b;
     active = true;
