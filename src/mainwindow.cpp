@@ -135,7 +135,6 @@ void MainWindow::setupMenu() {
     connect(hostGameAction.get(), &QAction::triggered, [=]() { setupNewGame(NewGameType::HOST); });
     connect(connectGameAction.get(), &QAction::triggered, [=]() { setupNewGame(NewGameType::CONNECT); });
 
-    connect(disconnectAction.get(), &QAction::triggered, this, &MainWindow::disconnectPlayer);
     connect(stopServerAction.get(), &QAction::triggered, this, &MainWindow::stopServer);
 
     connect(aboutAction.get(), &QAction::triggered, [=]() {
@@ -286,6 +285,8 @@ void MainWindow::connectToServer(QString host) {
 
     connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
     connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
+
+    connect(disconnectAction.get(), &QAction::triggered, me.get(), &Player::disconnectFromServer);
 }
 
 void MainWindow::changeName() {
