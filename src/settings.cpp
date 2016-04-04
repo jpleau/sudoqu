@@ -1,5 +1,5 @@
 /*
- * connectdialog.h
+ * src/settings.cpp
  * Copyright (C) 2016  Jason Pleau <jason@jpleau.ca>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,26 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTDIALOG_H
-#define CONNECTDIALOG_H
+#include "src/settings.h"
 
-#include <QDialog>
+namespace Sudoqu {
 
-namespace Ui {
-class ConnectDialog;
+Sudoqu::Settings::Settings(QObject *parent) : QSettings("jpleau", "Sudoqu", parent) {
 }
 
-class ConnectDialog : public QDialog {
-    Q_OBJECT
+QString Settings::getHost() const {
+    return this->value("lastConnectedHost", "").toString();
+}
 
-public:
-    explicit ConnectDialog(QString, QWidget *parent = 0);
-    ~ConnectDialog();
+void Settings::setHost(QString h) {
+    this->setValue("lastConnectedHost", h);
+}
 
-    QString getHost() const;
+QString Settings::getName() const {
+    QString name = qgetenv("USER");
+    if (name.isEmpty()) {
+        name = qgetenv("USERNAME");
+    } else if (name.isEmpty()) {
+        name = "Player";
+    }
 
-private:
-    Ui::ConnectDialog *ui;
-};
+    return this->value("playerName", name).toString();
+}
 
-#endif // CONNECTDIALOG_H
+void Settings::setName(QString n) {
+    this->setValue("playerName", n);
+}
+}

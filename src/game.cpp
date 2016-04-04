@@ -221,6 +221,8 @@ void Game::dataReceived() {
                     QJsonObject obj(sendBoard());
                     sendMessageToPlayer(obj, player);
                 }
+
+                sendStatusChanges();
             } else if (message == CHAT_MESSAGE) {
                 obj["name"] = player->getName();
                 sendMessageToPlayersExcept(obj, player);

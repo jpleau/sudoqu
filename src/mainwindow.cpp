@@ -31,14 +31,7 @@ namespace Sudoqu {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    QString name = qgetenv("USER");
-    if (name.isEmpty()) {
-        name = qgetenv("USERNAME");
-    } else if (name.isEmpty()) {
-        name = "Player";
-    }
-
-    ui->nickname->setText(name);
+    ui->nickname->setText(settings.getName());
 
     ui->difficulty->addItem("Simple", SB::SIMPLE);
     ui->difficulty->addItem("Easy", SB::EASY);
@@ -182,9 +175,10 @@ void MainWindow::setupNewGame(NewGameType type) {
     }
 
     if (type == CONNECT) {
-        ConnectDialog dialog;
+        ConnectDialog dialog(settings.getHost(), this);
         if (dialog.exec() == QDialog::Accepted) {
             host = dialog.getHost();
+            settings.setHost(host);
         } else {
             return;
         }
@@ -294,10 +288,12 @@ void MainWindow::connectToServer(QString host) {
 }
 
 void MainWindow::changeName() {
-    if (me) {
-        if (!ui->nickname->text().trimmed().isEmpty()) {
-            me->changeName(ui->nickname->text().trimmed());
+    QString name = ui->nickname->text().trimmed();
+    if (!name.isEmpty()) {
+        if (me) {
+            me->changeName(name);
         }
+        settings.setName(name);
     }
 }
 
@@ -320,5 +316,4 @@ void MainWindow::sendChatMessage() {
 void MainWindow::clearChat() {
     ui->chat_area->clear();
 }
-
 }

@@ -1,5 +1,5 @@
 /*
- * connectdialog.h
+ * src/settings.h
  * Copyright (C) 2016  Jason Pleau <jason@jpleau.ca>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,26 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTDIALOG_H
-#define CONNECTDIALOG_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-#include <QDialog>
+#include <QSettings>
 
-namespace Ui {
-class ConnectDialog;
-}
+namespace Sudoqu {
 
-class ConnectDialog : public QDialog {
+class Settings : public QSettings {
     Q_OBJECT
-
 public:
-    explicit ConnectDialog(QString, QWidget *parent = 0);
-    ~ConnectDialog();
+    Settings(QObject * = nullptr);
 
     QString getHost() const;
+    void setHost(QString);
 
-private:
-    Ui::ConnectDialog *ui;
+    QString getName() const;
+    void setName(QString);
 };
+}
 
-#endif // CONNECTDIALOG_H
+#endif

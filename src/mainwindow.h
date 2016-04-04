@@ -19,6 +19,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "settings.h"
+
 #include <QActionGroup>
 #include <QMainWindow>
 
@@ -50,6 +52,7 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+    Settings settings;
     std::unique_ptr<Game> game;
     std::unique_ptr<Player> me;
 

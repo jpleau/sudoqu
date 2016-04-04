@@ -28,16 +28,16 @@ namespace Sudoqu {
 class ChatBox : public QLineEdit {
     Q_OBJECT
 public:
-	enum : int{
-		CHAT_UP,
-		CHAT_DOWN,
-	};
-	
+    enum : int {
+        CHAT_UP,
+        CHAT_DOWN,
+    };
+
     ChatBox(QWidget * = nullptr);
-	
+
 signals:
-	void chatMessageScroll(int);
-	
+    void chatMessageScroll(int);
+
 protected:
     void keyPressEvent(QKeyEvent *) override;
 };

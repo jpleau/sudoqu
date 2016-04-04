@@ -29,14 +29,13 @@ ChatBox::ChatBox(QWidget *parent) : QLineEdit(parent) {
 void ChatBox::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
     case Qt::Key_Up:
-			emit chatMessageScroll(CHAT_UP);
+        emit chatMessageScroll(CHAT_UP);
         break;
     case Qt::Key_Down:
-			emit chatMessageScroll(CHAT_DOWN);
+        emit chatMessageScroll(CHAT_DOWN);
         break;
     default:
         QLineEdit::keyPressEvent(event);
     }
 }
-
 }
