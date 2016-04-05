@@ -35,5 +35,9 @@ VERSION = "0.0.1"
 
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
+CONFIG(debug, debug|release){
+    DEFINES += DEBUG
+}
+
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing

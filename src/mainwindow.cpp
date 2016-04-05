@@ -64,13 +64,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             ui->frame->repaint();
         }
     }
-
+#ifdef DEBUG
     if (event->key() == Qt::Key_L) {
         auto modifiers = event->modifiers();
         if (modifiers & Qt::AltModifier && modifiers & Qt::ControlModifier) {
             ui->frame->cheat();
         }
     }
+#endif
 }
 
 void MainWindow::disconnectPlayer() {
