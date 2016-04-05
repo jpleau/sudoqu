@@ -41,6 +41,8 @@ void Game::start_game(SB::Difficulty difficulty) {
 
     active = true;
 
+    counts.clear();
+
     sendStatusChanges();
 }
 
