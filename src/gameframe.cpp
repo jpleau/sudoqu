@@ -37,6 +37,7 @@ void GameFrame::newBoard(std::vector<int> &g, std::vector<int> &b, GameMode m) {
     active = true;
     mode = m;
     repaint();
+    emit setGameMode(mode);
 }
 
 int GameFrame::getAt(int pos) const {

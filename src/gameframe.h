@@ -56,6 +56,7 @@ signals:
     void setCount(int, int, int);
     void completeBoard(std::vector<int> &, int);
     void sendFocusedSquare(int);
+    void setGameMode(GameMode);
 
 protected:
     void paintEvent(QPaintEvent *) override;
