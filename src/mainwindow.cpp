@@ -161,7 +161,6 @@ void MainWindow::setupMenu() {
         msgBox.setInformativeText(aboutMsg);
         msgBox.exec();
     });
-
     connect(aboutQtAction.get(), &QAction::triggered, QApplication::aboutQt);
 }
 
@@ -172,6 +171,12 @@ void MainWindow::startServer(bool acceptConnections) {
         int selectedDifficulty = ui->difficulty->itemData(ui->difficulty->currentIndex()).toInt();
         SB::Difficulty difficulty = static_cast<SB::Difficulty>(selectedDifficulty);
         GameMode mode = static_cast<GameMode>(ui->game_mode->checkedId());
+
+        if (mode == COOP) {
+            ui->clear_fields->setEnabled(false);
+        } else {
+            ui->clear_fields->setEnabled(true);
+        }
         game->start_game(difficulty, mode);
 
     });
@@ -199,7 +204,12 @@ void MainWindow::connectToServer(QString host) {
         return;
     }
 
+#ifdef DEBUG
+    host = "localhost";
+#endif
+
     if (host.trimmed().isEmpty()) {
+
         ConnectDialog dialog(settings.getHost(), this);
         if (dialog.exec() == QDialog::Accepted) {
             host = dialog.getHost();
@@ -282,8 +292,9 @@ void MainWindow::connectToServer(QString host) {
 
     connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
     connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
-
+    connect(ui->frame, &GameFrame::sendFocusedSquare, me.get(), &Player::sendFocusedSquare);
     connect(disconnectAction.get(), &QAction::triggered, me.get(), &Player::disconnectFromServer);
+    connect(me.get(), &Player::otherPlayerFocus, ui->frame, &GameFrame::otherPlayerFocus);
 }
 
 void MainWindow::changeName() {

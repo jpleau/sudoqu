@@ -68,10 +68,12 @@ void Player::sendChatMessage(QString msg) {
     sendMessage(obj);
 }
 
-void Player::sendCount(int n) {
+void Player::sendCount(int n, int pos, int val) {
     QJsonObject obj;
     obj["message"] = NEW_COUNT;
     obj["count"] = n;
+    obj["pos"] = pos;
+    obj["val"] = val;
     sendMessage(obj);
 }
 
@@ -120,6 +122,14 @@ void Player::changeName(QString new_name) {
     obj["message"] = CHANGE_NAME;
     obj["old_name"] = this->name;
     obj["new_name"] = new_name.toHtmlEscaped();
+    sendMessage(obj);
+}
+
+void Player::sendFocusedSquare(int pos) {
+    QJsonObject obj;
+    obj["message"] = SET_FOCUS;
+    obj["pos"] = pos;
+    obj["id"] = id;
     sendMessage(obj);
 }
 
@@ -175,13 +185,22 @@ void Player::dataReceived() {
                 break;
 
             case NEW_GAME: {
-                auto array = obj["board"].toArray();
-                std::vector<int> board;
+                auto array = obj["given"].toArray();
+                std::vector<int> given;
                 for (int i = 0; i < array.size(); ++i) {
-                    board.push_back(array[i].toInt());
+                    given.push_back(array[i].toInt());
+                }
+
+                auto board = given;
+                if (obj.find("board") != obj.end()) {
+                    board.clear();
+                    array = obj["board"].toArray();
+                    for (int i = 0; i < array.size(); ++i) {
+                        board.push_back(array[i].toInt());
+                    }
                 }
                 GameMode mode = static_cast<GameMode>(obj["mode"].toInt());
-                emit receivedNewBoard(board, mode);
+                emit receivedNewBoard(given, board, mode);
                 break;
             }
 
@@ -189,8 +208,12 @@ void Player::dataReceived() {
                 emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
                 break;
 
-            case NEW_COUNT:
+            case NEW_VALUE:
                 emit otherPlayerValue(obj["pos"].toInt(), obj["val"].toInt());
+                break;
+
+            case SET_FOCUS:
+                emit otherPlayerFocus(obj["id"].toInt(), obj["pos"].toInt());
                 break;
             }
         }

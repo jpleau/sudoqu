@@ -30,13 +30,12 @@ namespace Sudoqu {
 GameFrame::GameFrame(QWidget *parent) : QFrame(parent), active(false) {
 }
 
-void GameFrame::newBoard(std::vector<int> b, GameMode m) {
+void GameFrame::newBoard(std::vector<int> &g, std::vector<int> &b, GameMode m) {
     focused = -1;
+    given = g;
     board = b;
-    given = b;
     active = true;
     mode = m;
-
     repaint();
 }
 
@@ -88,8 +87,12 @@ void GameFrame::clearBoard() {
 }
 
 void GameFrame::receiveData(int pos, int val) {
-    qDebug() << "allo";
     setAt(pos, val);
+    repaint();
+}
+
+void GameFrame::otherPlayerFocus(int id, int pos) {
+    playersFocus[id] = pos;
     repaint();
 }
 
@@ -124,6 +127,15 @@ void GameFrame::paintEvent(QPaintEvent *) {
 
     painter.setPen(pen);
 
+    std::map<int, bool> otherFocus;
+    if (!playersFocus.empty()) {
+        for (auto f : playersFocus) {
+            if (f.second > -1) {
+                otherFocus[f.second] = true;
+            }
+        }
+    }
+
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
             int pos = row * rows + col;
@@ -137,6 +149,8 @@ void GameFrame::paintEvent(QPaintEvent *) {
 
             if (pos == focused) {
                 painter.fillRect(rect, Qt::yellow);
+            } else if (otherFocus[pos]) {
+                painter.fillRect(rect, QColor(173, 239, 249));
             }
 
             if (value > 0) {
@@ -188,10 +202,13 @@ void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
 
     if (getGivenAt(pos) > 0) {
         focused = -1;
-        return;
+    } else {
+        focused = pos;
     }
 
-    focused = pos;
+    if (mode == COOP) {
+        emit sendFocusedSquare(focused);
+    }
 
     repaint();
 }
@@ -214,7 +231,6 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
             if (mode == VERSUS) {
                 sendData();
             } else if (mode == COOP) {
-                qDebug() << "XX";
                 sendData(focused, value);
             }
         }

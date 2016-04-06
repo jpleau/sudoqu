@@ -47,6 +47,7 @@ private:
     int current_id;
     std::map<QTcpSocket *, std::shared_ptr<Player>> players;
     std::unique_ptr<Sudoku> board;
+    std::vector<int> coop_board;
     bool active = false;
     bool done = false;
     GameMode mode;

@@ -33,13 +33,16 @@ Game::Game(QObject *parent) : QTcpServer(parent) {
 }
 
 void Game::start_game(SB::Difficulty difficulty, GameMode m) {
+    mode = m;
     board.reset(new Sudoku);
     board->generate(difficulty);
 
+    if (mode == COOP) {
+        coop_board = board->getPuzzle();
+    }
+
     QJsonObject obj(sendBoard());
     sendMessageToAllPlayers(obj);
-
-    mode = m;
 
     active = true;
 
@@ -150,15 +153,18 @@ bool Game::checkSolution(std::vector<int> &board_check) const {
 QJsonObject Game::sendBoard() {
     QJsonObject obj;
     obj["message"] = NEW_GAME;
+    obj["mode"] = mode;
 
     std::vector<int> puzzle = board->getPuzzle();
     std::list<QVariant> list(puzzle.begin(), puzzle.end());
-    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
-
     QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
-    obj["board"] = array;
+    obj["given"] = array;
 
-    obj["mode"] = mode;
+    if (mode == COOP) {
+        std::list<QVariant> list_coop(coop_board.begin(), coop_board.end());
+        QJsonArray coop_json = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list_coop));
+        obj["board"] = coop_json;
+    }
 
     return obj;
 }
@@ -262,6 +268,8 @@ void Game::dataReceived() {
                     obj["message"] = NEW_VALUE;
                     obj.remove("count");
                     sendMessageToPlayersExcept(obj, player);
+                    size_t pos = static_cast<size_t>(obj["pos"].toInt());
+                    coop_board[pos] = obj["val"].toInt();
                 }
 
                 sendStatusChanges();
@@ -285,6 +293,10 @@ void Game::dataReceived() {
                 obj["id"] = player->getId();
                 sendMessageToAllPlayers(obj);
                 sendStatusChanges();
+                break;
+
+            case SET_FOCUS:
+                sendMessageToPlayersExcept(obj, player);
                 break;
             }
         }

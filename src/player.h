@@ -64,7 +64,7 @@ public:
         return socket.get();
     }
 
-    void sendCount(int);
+    void sendCount(int, int, int);
 
     void setDone(bool);
     bool isDone() const;
@@ -73,6 +73,8 @@ public:
 
     void changeName(QString);
 
+    void sendFocusedSquare(int);
+
 signals:
     void receivedNewPlayer(int, QString);
     void playerConnected();
@@ -80,9 +82,10 @@ signals:
     void receivedChatMessage(QString, QString);
     void receivedStatusChanges(std::vector<StatusChange> &, int);
     void otherPlayerDisconnected(QString);
-    void receivedNewBoard(std::vector<int> &, GameMode);
+    void receivedNewBoard(std::vector<int> &, std::vector<int> &, GameMode);
     void otherPlayerChangedName(int, QString, QString);
     void otherPlayerValue(int, int);
+    void otherPlayerFocus(int, int);
 
 private:
     int id;

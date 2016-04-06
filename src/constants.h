@@ -33,13 +33,14 @@ enum Messages : int {
     STATUS_CHANGE,
     SEND_NAME,
     SERVER_DOWN,
+    SET_FOCUS,
     TEST_SOLUTION,
     YOUR_ID,
 };
 
 enum GameMode : int {
     VERSUS = 1,
-    COOP,
+    COOP = 2,
 };
 }
 

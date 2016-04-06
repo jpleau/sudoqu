@@ -33,7 +33,7 @@ class GameFrame : public QFrame {
 public:
     GameFrame(QWidget * = nullptr);
 
-    void newBoard(std::vector<int>, GameMode);
+    void newBoard(std::vector<int> &, std::vector<int> &, GameMode);
 
     int getAt(int) const;
     void setAt(int, int);
@@ -50,9 +50,12 @@ public:
 
     void receiveData(int, int);
 
+    void otherPlayerFocus(int, int);
+
 signals:
     void setCount(int, int, int);
     void completeBoard(std::vector<int> &, int);
+    void sendFocusedSquare(int);
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -73,6 +76,8 @@ private:
     int focused = -1;
 
     void sendData(int = -1, int = -1);
+
+    std::map<int, int> playersFocus;
 };
 }
 
