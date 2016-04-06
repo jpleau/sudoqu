@@ -19,29 +19,19 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include "constants.h"
+
 #include <QJsonObject>
 
 class QTcpSocket;
 
 namespace Sudoqu {
 
-enum Messages : int {
-    CHAT_MESSAGE,
-    CHANGE_NAME,
-    DISCONNECT,
-    DISCONNECT_OK,
-    NEW_PLAYER,
-    NEW_GAME,
-    NEW_COUNT,
-    STATUS_CHANGE,
-    SEND_NAME,
-    SERVER_DOWN,
-    TEST_SOLUTION,
-    YOUR_ID,
+class Network {
+public:
+    static void sendNetworkMessage(QJsonObject &, QTcpSocket *);
+    static QJsonObject readNetworkMessage(QString);
 };
-
-void sendNetworkMessage(QJsonObject &, QTcpSocket *);
-QJsonObject readNetworkMessage(QString);
 }
 
 #endif

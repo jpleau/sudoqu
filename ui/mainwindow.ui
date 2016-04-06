@@ -108,6 +108,20 @@
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="clear_fields">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Clear fields</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
             <widget class="QPushButton" name="start_game">
              <property name="enabled">
               <bool>false</bool>
@@ -137,13 +151,29 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="clear_fields">
+            <widget class="QRadioButton" name="puzzle_versus">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Clear fields</string>
+              <string>Versus</string>
              </property>
+             <attribute name="buttonGroup">
+              <string notr="true">game_mode</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="puzzle_coop">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Coop</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">game_mode</string>
+             </attribute>
             </widget>
            </item>
           </layout>
@@ -267,6 +297,16 @@
     <string>New game</string>
    </property>
   </action>
+  <action name="newGameMenu">
+   <property name="text">
+    <string>New Game</string>
+   </property>
+  </action>
+  <action name="actionMjijij">
+   <property name="text">
+    <string>mjijij</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -284,4 +324,7 @@
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="game_mode"/>
+ </buttongroups>
 </ui>

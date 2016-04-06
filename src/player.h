@@ -19,6 +19,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "constants.h"
+
 #include <QObject>
 #include <QString>
 
@@ -78,8 +80,9 @@ signals:
     void receivedChatMessage(QString, QString);
     void receivedStatusChanges(std::vector<StatusChange> &, int);
     void otherPlayerDisconnected(QString);
-    void receivedNewBoard(std::vector<int> &);
+    void receivedNewBoard(std::vector<int> &, GameMode);
     void otherPlayerChangedName(int, QString, QString);
+    void otherPlayerValue(int, int);
 
 private:
     int id;

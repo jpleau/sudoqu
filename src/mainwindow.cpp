@@ -17,12 +17,12 @@
  */
 
 #include "mainwindow.h"
+
 #include "connectdialog.h"
-
-#include "ui_mainwindow.h"
-
 #include "game.h"
 #include "player.h"
+
+#include "ui_mainwindow.h"
 
 #include <QMessageBox>
 
@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::changeName);
     connect(ui->nickname_change, &QToolButton::clicked, this, &MainWindow::changeName);
     connect(ui->clear_fields, &QPushButton::clicked, ui->frame, &GameFrame::clearBoard);
+
+    ui->game_mode->setId(ui->puzzle_versus, VERSUS);
+    ui->game_mode->setId(ui->puzzle_coop, COOP);
 }
 
 MainWindow::~MainWindow() {
@@ -93,17 +96,15 @@ void MainWindow::closeEvent(QCloseEvent *) {
     }
 }
 
-void MainWindow::newBoard(std::vector<int> &board) {
-    ui->frame->newBoard(board);
-}
-
 void MainWindow::setupMenu() {
     newGameGroup = std::make_unique<QActionGroup>(this);
 
-    hostGameAction = std::make_unique<QAction>("Host a game", newGameGroup.get());
-    hostGameAction->setShortcut(QKeySequence::New);
+    hostGameAction = std::make_unique<QAction>("Host game", newGameGroup.get());
+    hostGameAction->setShortcut(Qt::CTRL | Qt::Key_N);
+
     connectGameAction = std::make_unique<QAction>("Connect to a game", newGameGroup.get());
-    connectGameAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_N);
+    connectGameAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C);
+
     ui->menuGame->addActions(newGameGroup->actions());
 
     ui->menuGame->addSeparator();
@@ -129,8 +130,9 @@ void MainWindow::setupMenu() {
 
     connect(quitAction.get(), &QAction::triggered, this, &MainWindow::close);
 
-    connect(hostGameAction.get(), &QAction::triggered, [=]() { setupNewGame(NewGameType::HOST); });
-    connect(connectGameAction.get(), &QAction::triggered, [=]() { setupNewGame(NewGameType::CONNECT); });
+    connect(hostGameAction.get(), &QAction::triggered, [=]() { setupServer(); });
+
+    connect(connectGameAction.get(), &QAction::triggered, [=]() { connectToServer(); });
 
     connect(stopServerAction.get(), &QAction::triggered, this, &MainWindow::stopServer);
 
@@ -163,45 +165,21 @@ void MainWindow::setupMenu() {
     connect(aboutQtAction.get(), &QAction::triggered, QApplication::aboutQt);
 }
 
-void MainWindow::setupNewGame(NewGameType type) {
-    if (ui->nickname->text().trimmed().isEmpty()) {
-        ui->nickname->setStyleSheet("QLineEdit { background-color: #cc0000; color: #fff; }");
-        ui->nickname->setFocus();
-        return;
-    }
-
-    QString host = "localhost";
-
-    if (type == HOST) {
-        bool acceptConnections = true;
-        startServer(acceptConnections);
-    }
-
-    if (type == CONNECT) {
-        ConnectDialog dialog(settings.getHost(), this);
-        if (dialog.exec() == QDialog::Accepted) {
-            host = dialog.getHost();
-            settings.setHost(host);
-        } else {
-            return;
-        }
-    }
-
-    connectToServer(host);
-}
-
 void MainWindow::startServer(bool acceptConnections) {
     game.reset(new Game(this));
     game->start_server(acceptConnections);
     connect(ui->start_game, &QPushButton::clicked, [=]() {
         int selectedDifficulty = ui->difficulty->itemData(ui->difficulty->currentIndex()).toInt();
         SB::Difficulty difficulty = static_cast<SB::Difficulty>(selectedDifficulty);
-        game->start_game(difficulty);
+        GameMode mode = static_cast<GameMode>(ui->game_mode->checkedId());
+        game->start_game(difficulty, mode);
 
     });
     stopServerAction->setEnabled(true);
     ui->start_game->setEnabled(true);
     ui->difficulty->setEnabled(true);
+    ui->puzzle_coop->setEnabled(true);
+    ui->puzzle_versus->setEnabled(true);
 }
 
 void MainWindow::stopServer() {
@@ -215,6 +193,22 @@ void MainWindow::stopServer() {
 }
 
 void MainWindow::connectToServer(QString host) {
+    if (ui->nickname->text().trimmed().isEmpty()) {
+        ui->nickname->setStyleSheet("QLineEdit { background-color: #cc0000; color: #fff; }");
+        ui->nickname->setFocus();
+        return;
+    }
+
+    if (host.trimmed().isEmpty()) {
+        ConnectDialog dialog(settings.getHost(), this);
+        if (dialog.exec() == QDialog::Accepted) {
+            host = dialog.getHost();
+            settings.setHost(host);
+        } else {
+            return;
+        }
+    }
+
     me.reset(new Player(nullptr));
     me->setName(ui->nickname->text());
     me->connectToGame(host);
@@ -280,9 +274,11 @@ void MainWindow::connectToServer(QString host) {
         ui->chat_area->appendHtml(msg);
     });
 
+    connect(me.get(), &Player::otherPlayerValue, ui->frame, &GameFrame::receiveData);
+
     connect(ui->clear_chat, &QPushButton::clicked, this, &MainWindow::clearChat);
 
-    connect(me.get(), &Player::receivedNewBoard, this, &MainWindow::newBoard);
+    connect(me.get(), &Player::receivedNewBoard, ui->frame, &GameFrame::newBoard);
 
     connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
     connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
@@ -318,5 +314,11 @@ void MainWindow::sendChatMessage() {
 
 void MainWindow::clearChat() {
     ui->chat_area->clear();
+}
+
+void MainWindow::setupServer() {
+    bool acceptConnections = true;
+    startServer(acceptConnections);
+    connectToServer("localhost");
 }
 }

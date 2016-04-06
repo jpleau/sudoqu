@@ -19,6 +19,8 @@
 #ifndef GAMEFRAME_H
 #define GAMEFRAME_H
 
+#include "constants.h"
+
 #include <QFrame>
 
 #include <map>
@@ -31,7 +33,7 @@ class GameFrame : public QFrame {
 public:
     GameFrame(QWidget * = nullptr);
 
-    void newBoard(std::vector<int>);
+    void newBoard(std::vector<int>, GameMode);
 
     int getAt(int) const;
     void setAt(int, int);
@@ -46,8 +48,10 @@ public:
 
     void clearBoard();
 
+    void receiveData(int, int);
+
 signals:
-    void setCount(int);
+    void setCount(int, int, int);
     void completeBoard(std::vector<int> &, int);
 
 protected:
@@ -59,6 +63,7 @@ private:
     bool active;
     std::vector<int> board;
     std::vector<int> given;
+    GameMode mode;
 
     std::map<int, int> key_map = {
         {Qt::Key_1, 1}, {Qt::Key_2, 2}, {Qt::Key_3, 3}, {Qt::Key_4, 4}, {Qt::Key_5, 5},
@@ -67,7 +72,7 @@ private:
 
     int focused = -1;
 
-    void sendData();
+    void sendData(int = -1, int = -1);
 };
 }
 

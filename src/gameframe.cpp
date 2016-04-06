@@ -17,6 +17,7 @@
  */
 
 #include "gameframe.h"
+
 #include "sudoku.h"
 
 #include <QDebug>
@@ -29,11 +30,13 @@ namespace Sudoqu {
 GameFrame::GameFrame(QWidget *parent) : QFrame(parent), active(false) {
 }
 
-void GameFrame::newBoard(std::vector<int> b) {
+void GameFrame::newBoard(std::vector<int> b, GameMode m) {
     focused = -1;
     board = b;
     given = b;
     active = true;
+    mode = m;
+
     repaint();
 }
 
@@ -81,6 +84,12 @@ void GameFrame::clearBoard() {
     board = given;
     focused = -1;
     sendData();
+    repaint();
+}
+
+void GameFrame::receiveData(int pos, int val) {
+    qDebug() << "allo";
+    setAt(pos, val);
     repaint();
 }
 
@@ -202,14 +211,19 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
         if (check != key_map.end()) {
             int value = check->second;
             setAt(focused, value);
-            sendData();
+            if (mode == VERSUS) {
+                sendData();
+            } else if (mode == COOP) {
+                qDebug() << "XX";
+                sendData(focused, value);
+            }
         }
     }
 
     repaint();
 }
 
-void GameFrame::sendData() {
+void GameFrame::sendData(int pos, int val) {
     int given_filled = 0;
     int board_filled = 0;
     int player_filled = 0;
@@ -230,7 +244,7 @@ void GameFrame::sendData() {
     if (board_filled == 81) {
         emit completeBoard(board, player_filled);
     } else {
-        emit setCount(player_filled);
+        emit setCount(player_filled, pos, val);
     }
 }
 }

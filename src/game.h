@@ -19,6 +19,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "constants.h"
 #include "player.h"
 #include "sudoku.h"
 
@@ -40,7 +41,7 @@ public:
     Game(QObject * = nullptr);
     void start_server(bool);
     void stop_server();
-    void start_game(SB::Difficulty);
+    void start_game(SB::Difficulty, GameMode);
 
 private:
     int current_id;
@@ -48,6 +49,7 @@ private:
     std::unique_ptr<Sudoku> board;
     bool active = false;
     bool done = false;
+    GameMode mode;
 
     void sendMessageToPlayer(QJsonObject &, Player *);
     void sendMessageToAllPlayers(QJsonObject &);

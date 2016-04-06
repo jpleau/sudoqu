@@ -32,17 +32,18 @@ Game::Game(QObject *parent) : QTcpServer(parent) {
     current_id = 0;
 }
 
-void Game::start_game(SB::Difficulty difficulty) {
+void Game::start_game(SB::Difficulty difficulty, GameMode m) {
     board.reset(new Sudoku);
     board->generate(difficulty);
 
     QJsonObject obj(sendBoard());
     sendMessageToAllPlayers(obj);
 
+    mode = m;
+
     active = true;
 
     counts.clear();
-
     sendStatusChanges();
 }
 
@@ -89,7 +90,7 @@ void Game::clientConnected() {
     for (auto &p : list) {
         obj["id"] = p->getId();
         obj["name"] = p->getName();
-        sendNetworkMessage(obj, *player);
+        Network::sendNetworkMessage(obj, *player);
     }
 }
 
@@ -112,7 +113,7 @@ void Game::clientDisconnected(QTcpSocket *socket) {
 }
 
 void Game::sendMessageToPlayer(QJsonObject &obj, Player *player) {
-    sendNetworkMessage(obj, *player);
+    Network::sendNetworkMessage(obj, *player);
 }
 
 void Game::sendMessageToAllPlayers(QJsonObject &obj) {
@@ -157,12 +158,13 @@ QJsonObject Game::sendBoard() {
     QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
     obj["board"] = array;
 
+    obj["mode"] = mode;
+
     return obj;
 }
 
 void Game::sendStatusChanges(Player *except) {
     QJsonArray list_players;
-    QJsonArray list_ready;
     QJsonArray list_count;
     QJsonArray list_done;
 
@@ -181,16 +183,33 @@ void Game::sendStatusChanges(Player *except) {
 
     send["count_total"] = count_total;
 
-    for (auto &p : players) {
-        if (p.second.get() != except) {
-            list_players.append(p.second->getName());
-            if (active) {
-                list_count.append(counts[p.second->getId()]);
-                list_done.append(p.second->isDone());
-            } else {
-                list_done.append(false);
+    if (mode == VERSUS) {
+        for (auto &p : players) {
+            if (p.second.get() != except) {
+                list_players.append(p.second->getName());
+                if (active) {
+                    list_count.append(counts[p.second->getId()]);
+                    list_done.append(p.second->isDone());
+                } else {
+                    list_done.append(false);
+                }
             }
         }
+    } else {
+        int count = 0;
+        bool done = false;
+        for (auto &p : players) {
+            if (p.second.get() != except) {
+                if (counts[p.second->getId()] > count) {
+                    count = counts[p.second->getId()];
+                }
+                done = done || p.second->isDone();
+            }
+        }
+
+        list_players.append("Team A");
+        list_count.append(count);
+        list_done.append(done);
     }
 
     send["message"] = STATUS_CHANGE;
@@ -207,7 +226,7 @@ void Game::dataReceived() {
     QString data;
     while (socket && socket->canReadLine()) {
         data = socket->readLine();
-        QJsonObject obj = readNetworkMessage(data);
+        QJsonObject obj = Network::readNetworkMessage(data);
         if (obj.contains("message")) {
             int id = obj["id"].toInt();
             int message = obj["message"].toInt();
@@ -236,10 +255,18 @@ void Game::dataReceived() {
                 clientDisconnected(socket);
                 break;
 
-            case NEW_COUNT:
+            case NEW_COUNT: {
                 counts[player->getId()] = obj["count"].toInt();
+
+                if (mode == COOP) {
+                    obj["message"] = NEW_VALUE;
+                    obj.remove("count");
+                    sendMessageToPlayersExcept(obj, player);
+                }
+
                 sendStatusChanges();
                 break;
+            }
 
             case TEST_SOLUTION: {
                 QJsonArray array = obj["board"].toArray();

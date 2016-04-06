@@ -1,5 +1,5 @@
 /*
- * connectdialog.cpp
+ * constants
  * Copyright (C) 2016  Jason Pleau <jason@jpleau.ca>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "connectdialog.h"
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
-#include "ui_connectdialog.h"
+namespace Sudoqu {
 
-ConnectDialog::ConnectDialog(QString host, QWidget *parent) : QDialog(parent), ui(new Ui::ConnectDialog) {
-    ui->setupUi(this);
-    ui->host->setText(host);
+enum Messages : int {
+    CHAT_MESSAGE,
+    CHANGE_NAME,
+    DISCONNECT,
+    DISCONNECT_OK,
+    NEW_PLAYER,
+    NEW_GAME,
+    NEW_COUNT,
+    NEW_VALUE,
+    STATUS_CHANGE,
+    SEND_NAME,
+    SERVER_DOWN,
+    TEST_SOLUTION,
+    YOUR_ID,
+};
+
+enum GameMode : int {
+    VERSUS = 1,
+    COOP,
+};
 }
 
-ConnectDialog::~ConnectDialog() {
-    delete ui;
-}
-
-QString ConnectDialog::getHost() const {
-    return ui->host->text();
-}
+#endif

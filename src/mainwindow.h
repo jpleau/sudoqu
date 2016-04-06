@@ -19,6 +19,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "constants.h"
 #include "settings.h"
 
 #include <QActionGroup>
@@ -31,11 +32,6 @@ class MainWindow;
 }
 
 namespace Sudoqu {
-
-enum NewGameType : int {
-    CONNECT,
-    HOST,
-};
 
 class Game;
 class Player;
@@ -59,14 +55,13 @@ private:
     void sendChatMessage();
     void disconnectPlayer();
     void closeEvent(QCloseEvent *);
-    void newBoard(std::vector<int> &);
     void setupMenu();
-    void setupNewGame(NewGameType);
     void startServer(bool);
     void stopServer();
-    void connectToServer(QString host);
+    void connectToServer(QString host = "");
     void changeName();
     void clearChat();
+    void setupServer();
 
     // Konami code
     int konamiCount = 0;

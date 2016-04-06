@@ -17,6 +17,8 @@
  */
 
 #include "player.h"
+
+#include "constants.h"
 #include "network.h"
 
 #include <QJsonArray>
@@ -74,7 +76,7 @@ void Player::sendCount(int n) {
 }
 
 void Player::sendMessage(QJsonObject &obj) {
-    sendNetworkMessage(obj, socket.get());
+    Network::sendNetworkMessage(obj, socket.get());
 }
 
 void Player::setId(int i) {
@@ -125,7 +127,7 @@ void Player::dataReceived() {
     QString data;
     while (socket != nullptr && socket->canReadLine()) {
         data = socket->readLine();
-        QJsonObject obj = readNetworkMessage(data);
+        QJsonObject obj = Network::readNetworkMessage(data);
         if (obj.contains("message")) {
             int message = obj["message"].toInt();
 
@@ -178,11 +180,17 @@ void Player::dataReceived() {
                 for (int i = 0; i < array.size(); ++i) {
                     board.push_back(array[i].toInt());
                 }
-                emit receivedNewBoard(board);
+                GameMode mode = static_cast<GameMode>(obj["mode"].toInt());
+                emit receivedNewBoard(board, mode);
                 break;
             }
+
             case CHANGE_NAME:
                 emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
+                break;
+
+            case NEW_COUNT:
+                emit otherPlayerValue(obj["pos"].toInt(), obj["val"].toInt());
                 break;
             }
         }

@@ -23,14 +23,14 @@
 
 namespace Sudoqu {
 
-void sendNetworkMessage(QJsonObject &obj, QTcpSocket *socket) {
+void Network::sendNetworkMessage(QJsonObject &obj, QTcpSocket *socket) {
     QJsonDocument doc(obj);
     QString rules(doc.toJson(QJsonDocument::Compact));
     QTextStream data(socket);
     data << rules << endl;
 }
 
-QJsonObject readNetworkMessage(QString data) {
+QJsonObject Network::readNetworkMessage(QString data) {
     QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
     return doc.object();
 }

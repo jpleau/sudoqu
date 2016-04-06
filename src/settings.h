@@ -1,5 +1,5 @@
 /*
- * src/settings.h
+ * settings.h
  * Copyright (C) 2016  Jason Pleau <jason@jpleau.ca>
  *
  * This program is free software: you can redistribute it and/or modify

@@ -25,7 +25,8 @@ HEADERS  += src/mainwindow.h \
             src/network.h \
             src/connectdialog.h \
             src/chatbox.h \
-            src/settings.h
+            src/settings.h \
+            src/constants.h
 
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui
