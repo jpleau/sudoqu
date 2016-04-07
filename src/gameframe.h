@@ -36,7 +36,7 @@ public:
     void newBoard(std::vector<int> &, std::vector<int> &, GameMode);
 
     int getAt(int) const;
-    void setAt(int, int);
+    void setAt(int, int, bool = false);
 
     int getGivenAt(int) const;
 

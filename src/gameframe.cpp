@@ -44,8 +44,11 @@ int GameFrame::getAt(int pos) const {
     return board[static_cast<size_t>(pos)];
 }
 
-void GameFrame::setAt(int pos, int val) {
+void GameFrame::setAt(int pos, int val, bool send_network) {
     board[static_cast<size_t>(pos)] = val;
+    if (send_network) {
+        sendData(pos, val);
+    }
 }
 
 int GameFrame::getGivenAt(int pos) const {
@@ -88,7 +91,7 @@ void GameFrame::clearBoard() {
 }
 
 void GameFrame::receiveData(int pos, int val) {
-    setAt(pos, val);
+    setAt(pos, val, false);
     repaint();
 }
 
@@ -220,20 +223,13 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
     }
     int key = event->key();
     if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
-        setAt(focused, 0);
-        sendData();
+        setAt(focused, 0, true);
     } else if (key == Qt::Key_Escape) {
         focused = -1;
     } else {
         auto check = key_map.find(key);
         if (check != key_map.end()) {
-            int value = check->second;
-            setAt(focused, value);
-            if (mode == VERSUS) {
-                sendData();
-            } else if (mode == COOP) {
-                sendData(focused, value);
-            }
+            setAt(focused, check->second, true);
         }
     }
 
@@ -241,6 +237,10 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
 }
 
 void GameFrame::sendData(int pos, int val) {
+    if (mode == VERSUS) {
+        pos = val = -1;
+    }
+
     int given_filled = 0;
     int board_filled = 0;
     int player_filled = 0;
@@ -258,6 +258,7 @@ void GameFrame::sendData(int pos, int val) {
     }
 
     player_filled = board_filled - given_filled;
+
     if (board_filled == 81) {
         emit completeBoard(board, player_filled);
     } else {
