@@ -296,6 +296,7 @@ void MainWindow::connectToServer(QString host) {
     });
     connect(disconnectAction.get(), &QAction::triggered, me.get(), &Player::disconnectFromServer);
     connect(me.get(), &Player::otherPlayerFocus, ui->frame, &GameFrame::otherPlayerFocus);
+    connect(me.get(), &Player::badVersion, this, &MainWindow::badVersion);
 }
 
 void MainWindow::changeName() {
@@ -332,5 +333,9 @@ void MainWindow::setupServer() {
     bool acceptConnections = true;
     startServer(acceptConnections);
     connectToServer("localhost");
+}
+
+void MainWindow::badVersion(int server_version, int client_version) {
+    ui->status->showMessage(QString("Bad version. Server: %1 -- Client: %2").arg(server_version).arg(client_version));
 }
 }

@@ -86,6 +86,7 @@ signals:
     void otherPlayerChangedName(int, QString, QString);
     void otherPlayerValue(int, int);
     void otherPlayerFocus(int, int);
+    void badVersion(int, int);
 
 private:
     int id;

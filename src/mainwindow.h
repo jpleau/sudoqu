@@ -62,6 +62,7 @@ private:
     void changeName();
     void clearChat();
     void setupServer();
+    void badVersion(int, int);
 
     // Konami code
     int konamiCount = 0;

@@ -149,6 +149,7 @@ void Player::dataReceived() {
                     send["message"] = SEND_NAME;
                     send["id"] = id;
                     send["name"] = name.toHtmlEscaped();
+                    send["version"] = SUDOQU_VERSION;
                     sendMessage(send);
                 }
                 break;
@@ -214,6 +215,9 @@ void Player::dataReceived() {
 
             case SET_FOCUS:
                 emit otherPlayerFocus(obj["id"].toInt(), obj["pos"].toInt());
+                break;
+            case BAD_VERSION:
+                emit badVersion(obj["server_version"].toInt(), obj["client_version"].toInt());
                 break;
             }
         }

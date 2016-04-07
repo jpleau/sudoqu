@@ -239,6 +239,14 @@ void Game::dataReceived() {
 
             switch (message) {
             case SEND_NAME:
+                if (obj.find("version") == obj.end() || obj["version"].toInt() != SUDOQU_VERSION) {
+                    QJsonObject bad;
+                    bad["message"] = BAD_VERSION;
+                    bad["server_version"] = SUDOQU_VERSION;
+                    bad["client_version"] = obj["version"].toInt();
+                    sendMessageToPlayer(bad, player);
+                    return;
+                }
                 if (id == player->getId()) {
                     player->setName(obj["name"].toString());
                     obj["message"] = NEW_PLAYER;

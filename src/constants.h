@@ -19,9 +19,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define SUDOQU_VERSION 1
+
 namespace Sudoqu {
 
 enum Messages : int {
+    BAD_VERSION,
     CHAT_MESSAGE,
     CHANGE_NAME,
     DISCONNECT,
