@@ -335,7 +335,7 @@ void MainWindow::connectToServer(QString host) {
 void MainWindow::changeName() {
     QString name = ui->nickname->text().trimmed();
     if (!name.isEmpty()) {
-        if (me) {
+        if (me && me->getName() != name) {
             me->changeName(name);
         }
         settings.setName(name);
