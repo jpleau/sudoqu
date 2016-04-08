@@ -1,4 +1,6 @@
 *.pro.*
 build/
+data/
 *.pyc
 .ycm_extra_conf.py*
+resources.qrc

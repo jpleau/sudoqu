@@ -24,6 +24,7 @@
 
 #include <QActionGroup>
 #include <QMainWindow>
+#include <QSound>
 
 #include <memory>
 
@@ -45,6 +46,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
 
 private:
     Ui::MainWindow *ui;
@@ -67,6 +69,7 @@ private:
     // Konami code
     int konamiCount = 0;
     QList<Qt::Key> konamiKeys;
+    QSound we_move_unseen;
 
     // Menu
     std::unique_ptr<QActionGroup> newGameGroup;

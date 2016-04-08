@@ -28,7 +28,8 @@
 
 namespace Sudoqu {
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), we_move_unseen("://data/we_move_unseen.wav") {
     ui->setupUi(this);
 
     ui->nickname->setText(settings.getName());
@@ -49,6 +50,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->game_mode->setId(ui->puzzle_versus, VERSUS);
     ui->game_mode->setId(ui->puzzle_coop, COOP);
+
+    konamiKeys = {
+        Qt::Key_Up,   Qt::Key_Up,    Qt::Key_Down, Qt::Key_Down, Qt::Key_Left,   Qt::Key_Right,
+        Qt::Key_Left, Qt::Key_Right, Qt::Key_B,    Qt::Key_A,    Qt::Key_Return,
+    };
 }
 
 MainWindow::~MainWindow() {
@@ -64,7 +70,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         }
 
         if (konamiCount >= konamiKeys.size()) {
-            ui->frame->repaint();
+            we_move_unseen.play();
+            konamiCount = 0;
         }
     }
 #ifdef DEBUG
@@ -75,6 +82,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         }
     }
 #endif
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *) {
+    setFocus();
 }
 
 void MainWindow::disconnectPlayer() {

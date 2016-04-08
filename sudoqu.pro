@@ -1,4 +1,4 @@
-QT += core gui widgets network
+QT += core gui widgets network multimedia
 
 CONFIG += c++14
 
@@ -42,3 +42,6 @@ CONFIG(debug, debug|release){
 
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing
+
+RESOURCES += \
+    resources.qrc
