@@ -385,7 +385,7 @@ void Game::dataReceived() {
                 if (player->getTeam() != team) {
                     assign_team(player, team, true);
                     if (active) {
-                        obj = sendBoard(team);
+                        obj = sendBoard(mode == COOP ? team : "");
                         sendMessageToPlayer(obj, player);
                     }
                     sendStatusChanges();

@@ -295,8 +295,12 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::otherPlayerValue, ui->frame, &GameFrame::receiveData);
 
-    connect(me.get(), &Player::receivedNewBoard, ui->frame,
-            [=](auto &given, auto &board, GameMode mode) { ui->frame->newBoard(given, board, mode); });
+    connect(me.get(), &Player::receivedNewBoard, ui->frame, [=](auto &given, auto &board, GameMode mode) {
+        ui->select_team->blockSignals(true);
+        ui->select_team->setEnabled(mode == COOP);
+        ui->select_team->blockSignals(false);
+        ui->frame->newBoard(given, board, mode);
+    });
 
     connect(me.get(), &Player::receivedTeamList, [=](QStringList &teams) {
         ui->select_team->blockSignals(true);
