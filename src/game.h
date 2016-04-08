@@ -64,6 +64,7 @@ private:
     bool checkSolution(std::vector<int> &) const;
     QJsonObject sendBoard(QString = "");
     void assign_team(Player *, QString, bool);
+    std::vector<Player *> listPlayersInTeam(QString, Player *);
 
 private slots:
     void clientConnected();

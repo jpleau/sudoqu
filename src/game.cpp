@@ -213,6 +213,16 @@ void Game::assign_team(Player *player, QString team, bool send) {
     }
 }
 
+std::vector<Player *> Game::listPlayersInTeam(QString t, Player *except) {
+    std::vector<Player *> ret;
+    for (auto p : players) {
+        if (p.second.get() != except && p.second->getTeam() == t) {
+            ret.push_back(p.second.get());
+        }
+    }
+    return ret;
+}
+
 void Game::sendStatusChanges(Player *except) {
     QJsonArray list_teams;
     QJsonArray list_players;
@@ -254,12 +264,16 @@ void Game::sendStatusChanges(Player *except) {
             for (auto &p : players) {
                 if (p.second->getTeam() == t) {
                     players_team.push_back(p.second->getName());
-                    if (counts[p.second->getId()] > count) {
-                        count = counts[p.second->getId()];
-                    }
-                    done = done || p.second->isDone();
                 }
             }
+
+            auto given_board = board->getPuzzle();
+            for (size_t i = 0; i < coop_boards[t].size(); ++i) {
+                if (coop_boards[t][i] > 0 && given_board[i] == 0) {
+                    ++count;
+                }
+            }
+            done = checkSolution(coop_boards[t]);
 
             if (!players_team.empty()) {
                 QString fullName = QString("%1: %2").arg(t).arg(players_team.join(", "));
@@ -350,12 +364,22 @@ void Game::dataReceived() {
             case TEST_SOLUTION: {
                 QJsonArray array = obj["board"].toArray();
                 std::vector<int> board;
-                counts[player->getId()] = obj["count"].toInt();
                 for (int i = 0; i < array.size(); ++i) {
                     board.push_back(array[i].toInt());
                 }
-                player->setDone(checkSolution(board));
-                sendStatusChanges();
+
+                if (mode == VERSUS) {
+                    counts[player->getId()] = obj["count"].toInt();
+
+                    player->setDone(checkSolution(board));
+                    sendStatusChanges();
+                } else {
+                    coop_boards[player->getTeam()] = board;
+                    obj = sendBoard(player->getTeam());
+                    auto send_players = listPlayersInTeam(player->getTeam(), player);
+                    sendMessageToPlayers(obj, send_players);
+                    sendStatusChanges();
+                }
                 break;
             }
 
