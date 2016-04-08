@@ -42,15 +42,17 @@ public:
     void start_server(bool);
     void stop_server();
     void start_game(SB::Difficulty, GameMode);
+    void setTeamNames(QStringList);
 
 private:
     int current_id;
     std::map<QTcpSocket *, std::shared_ptr<Player>> players;
     std::unique_ptr<Sudoku> board;
-    std::vector<int> coop_board;
+    std::map<QString, std::vector<int>> coop_boards;
     bool active = false;
     bool done = false;
     GameMode mode;
+    QStringList teams;
 
     void sendMessageToPlayer(QJsonObject &, Player *);
     void sendMessageToAllPlayers(QJsonObject &);
@@ -60,7 +62,8 @@ private:
     std::vector<Player *> listPlayers(Player * = nullptr);
     std::map<int, int> counts;
     bool checkSolution(std::vector<int> &) const;
-    QJsonObject sendBoard();
+    QJsonObject sendBoard(QString = "");
+    void assign_team(Player *, QString, bool);
 
 private slots:
     void clientConnected();

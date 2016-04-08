@@ -72,8 +72,12 @@ public:
     void testBoard(std::vector<int> &, int);
 
     void changeName(QString);
+    void changeTeam(QString);
 
     void sendFocusedSquare(int);
+
+    QString getTeam() const;
+    void setTeam(const QString &value);
 
 signals:
     void receivedNewPlayer(int, QString);
@@ -87,12 +91,15 @@ signals:
     void otherPlayerValue(int, int);
     void otherPlayerFocus(int, int);
     void badVersion(int, int);
+    void receivedTeamList(QStringList &);
+    void otherPlayerChangedTeam(QString, QString);
 
 private:
     int id;
     QString name;
     std::unique_ptr<QTcpSocket, SocketDeleter> socket;
     bool done = false;
+    QString team;
 
     void sendMessage(QJsonObject &);
 

@@ -30,6 +30,7 @@ namespace Sudoqu {
 
 Game::Game(QObject *parent) : QTcpServer(parent) {
     current_id = 0;
+    mode = NOT_PLAYING;
 }
 
 void Game::start_game(SB::Difficulty difficulty, GameMode m) {
@@ -38,16 +39,38 @@ void Game::start_game(SB::Difficulty difficulty, GameMode m) {
     board->generate(difficulty);
 
     if (mode == COOP) {
-        coop_board = board->getPuzzle();
+        auto p = board->getPuzzle();
+        for (auto team : teams) {
+            coop_boards[team] = p;
+        }
     }
 
-    QJsonObject obj(sendBoard());
-    sendMessageToAllPlayers(obj);
+    if (mode == VERSUS) {
+        QJsonObject obj(sendBoard());
+        sendMessageToAllPlayers(obj);
+    } else {
+        for (auto t : teams) {
+            std::vector<Player *> list_players;
+            for (auto p : players) {
+                if (p.second->getTeam() == t) {
+                    list_players.push_back(p.second.get());
+                }
+            }
+            if (!list_players.empty()) {
+                QJsonObject obj(sendBoard(t));
+                sendMessageToPlayers(obj, list_players);
+            }
+        }
+    }
 
     active = true;
 
     counts.clear();
     sendStatusChanges();
+}
+
+void Game::setTeamNames(QStringList t) {
+    teams = t;
 }
 
 void Game::start_server(bool acceptRemote) {
@@ -85,15 +108,26 @@ void Game::clientConnected() {
     QJsonObject obj;
     obj["message"] = YOUR_ID;
     obj["id"] = current_id;
+
+    QJsonArray team_array = QJsonArray::fromStringList(teams);
+    obj["teams"] = team_array;
+
+    obj["team"] = "";
+    if (!teams.empty()) {
+        obj["team"] = teams[0];
+        assign_team(player, teams[0], false);
+    }
+
     sendMessageToPlayer(obj, player);
 
     auto list = listPlayers(player);
 
-    obj["message"] = NEW_PLAYER;
+    QJsonObject newPlayer;
+    newPlayer["message"] = NEW_PLAYER;
     for (auto &p : list) {
-        obj["id"] = p->getId();
-        obj["name"] = p->getName();
-        Network::sendNetworkMessage(obj, *player);
+        newPlayer["id"] = p->getId();
+        newPlayer["name"] = p->getName();
+        Network::sendNetworkMessage(newPlayer, *player);
     }
 }
 
@@ -150,7 +184,7 @@ bool Game::checkSolution(std::vector<int> &board_check) const {
     return board_check == solution;
 }
 
-QJsonObject Game::sendBoard() {
+QJsonObject Game::sendBoard(QString team) {
     QJsonObject obj;
     obj["message"] = NEW_GAME;
     obj["mode"] = mode;
@@ -161,15 +195,26 @@ QJsonObject Game::sendBoard() {
     obj["given"] = array;
 
     if (mode == COOP) {
-        std::list<QVariant> list_coop(coop_board.begin(), coop_board.end());
+        std::list<QVariant> list_coop(coop_boards[team].begin(), coop_boards[team].end());
         QJsonArray coop_json = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list_coop));
         obj["board"] = coop_json;
     }
-
     return obj;
 }
 
+void Game::assign_team(Player *player, QString team, bool send) {
+    player->setTeam(team);
+    if (send) {
+        QJsonObject obj;
+        obj["message"] = CHANGE_TEAM;
+        obj["player"] = player->getName();
+        obj["team"] = team;
+        sendMessageToAllPlayers(obj);
+    }
+}
+
 void Game::sendStatusChanges(Player *except) {
+    QJsonArray list_teams;
     QJsonArray list_players;
     QJsonArray list_count;
     QJsonArray list_done;
@@ -189,7 +234,7 @@ void Game::sendStatusChanges(Player *except) {
 
     send["count_total"] = count_total;
 
-    if (mode == VERSUS) {
+    if (mode != COOP) {
         for (auto &p : players) {
             if (p.second.get() != except) {
                 list_players.append(p.second->getName());
@@ -202,20 +247,27 @@ void Game::sendStatusChanges(Player *except) {
             }
         }
     } else {
-        int count = 0;
-        bool done = false;
-        for (auto &p : players) {
-            if (p.second.get() != except) {
-                if (counts[p.second->getId()] > count) {
-                    count = counts[p.second->getId()];
+        for (auto t : teams) {
+            int count = 0;
+            bool done = false;
+            QStringList players_team;
+            for (auto &p : players) {
+                if (p.second->getTeam() == t) {
+                    players_team.push_back(p.second->getName());
+                    if (counts[p.second->getId()] > count) {
+                        count = counts[p.second->getId()];
+                    }
+                    done = done || p.second->isDone();
                 }
-                done = done || p.second->isDone();
+            }
+
+            if (!players_team.empty()) {
+                QString fullName = QString("%1: %2").arg(t).arg(players_team.join(", "));
+                list_players.append(fullName);
+                list_count.append(count);
+                list_done.append(done);
             }
         }
-
-        list_players.append("Team A");
-        list_count.append(count);
-        list_done.append(done);
     }
 
     send["message"] = STATUS_CHANGE;
@@ -254,7 +306,7 @@ void Game::dataReceived() {
                 }
 
                 if (active) {
-                    QJsonObject obj(sendBoard());
+                    QJsonObject obj(sendBoard(mode == COOP ? player->getTeam() : ""));
                     sendMessageToPlayer(obj, player);
                 }
 
@@ -275,9 +327,20 @@ void Game::dataReceived() {
                 if (mode == COOP) {
                     obj["message"] = NEW_VALUE;
                     obj.remove("count");
-                    sendMessageToPlayersExcept(obj, player);
+
+                    QString team = player->getTeam();
+                    std::vector<Player *> list_players;
+                    for (auto p : players) {
+                        if (p.second->getTeam() == team && p.second.get() != player) {
+                            list_players.push_back(p.second.get());
+                        }
+                    }
+                    if (!list_players.empty()) {
+                        sendMessageToPlayers(obj, list_players);
+                    }
+
                     size_t pos = static_cast<size_t>(obj["pos"].toInt());
-                    coop_board[pos] = obj["val"].toInt();
+                    coop_boards[player->getTeam()][pos] = obj["val"].toInt();
                 }
 
                 sendStatusChanges();
@@ -303,9 +366,32 @@ void Game::dataReceived() {
                 sendStatusChanges();
                 break;
 
-            case SET_FOCUS:
-                sendMessageToPlayersExcept(obj, player);
+            case SET_FOCUS: {
+                QString team = player->getTeam();
+                std::vector<Player *> list_players;
+                for (auto p : players) {
+                    if (p.second->getTeam() == team && p.second.get() != player) {
+                        list_players.push_back(p.second.get());
+                    }
+                }
+                if (!list_players.empty()) {
+                    sendMessageToPlayers(obj, list_players);
+                }
                 break;
+            }
+
+            case CHANGE_TEAM: {
+                QString team = obj["team"].toString();
+                if (player->getTeam() != team) {
+                    assign_team(player, team, true);
+                    if (active) {
+                        obj = sendBoard(team);
+                        sendMessageToPlayer(obj, player);
+                    }
+                    sendStatusChanges();
+                }
+                break;
+            }
             }
         }
     }

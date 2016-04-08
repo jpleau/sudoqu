@@ -45,4 +45,8 @@ QString Settings::getName() const {
 void Settings::setName(QString n) {
     this->setValue("playerName", n);
 }
+
+QStringList Settings::getTeamNames() const {
+    return this->value("teamNames", QVariant(QStringList())).toStringList();
+}
 }

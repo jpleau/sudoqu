@@ -125,12 +125,28 @@ void Player::changeName(QString new_name) {
     sendMessage(obj);
 }
 
+void Player::changeTeam(QString t) {
+    team = t;
+    QJsonObject obj;
+    obj["message"] = CHANGE_TEAM;
+    obj["team"] = team;
+    sendMessage(obj);
+}
+
 void Player::sendFocusedSquare(int pos) {
     QJsonObject obj;
     obj["message"] = SET_FOCUS;
     obj["pos"] = pos;
     obj["id"] = id;
     sendMessage(obj);
+}
+
+QString Player::getTeam() const {
+    return team;
+}
+
+void Player::setTeam(const QString &t) {
+    team = t;
 }
 
 void Player::dataReceived() {
@@ -142,17 +158,27 @@ void Player::dataReceived() {
             int message = obj["message"].toInt();
 
             switch (message) {
-            case YOUR_ID:
+            case YOUR_ID: {
                 this->setId(obj["id"].toInt());
-                {
-                    QJsonObject send;
-                    send["message"] = SEND_NAME;
-                    send["id"] = id;
-                    send["name"] = name.toHtmlEscaped();
-                    send["version"] = SUDOQU_VERSION;
-                    sendMessage(send);
+                QJsonObject send;
+                send["message"] = SEND_NAME;
+                send["id"] = id;
+                send["name"] = name.toHtmlEscaped();
+                send["version"] = SUDOQU_VERSION;
+                sendMessage(send);
+
+                auto arr_teams = obj["teams"].toArray();
+                QStringList teams;
+                for (auto t : arr_teams) {
+                    teams.push_back(t.toString());
                 }
+
+                team = obj["team"].toString();
+
+                emit receivedTeamList(teams);
+
                 break;
+            }
 
             case NEW_PLAYER:
                 emit receivedNewPlayer(obj["id"].toInt(), obj["name"].toString());
@@ -201,7 +227,9 @@ void Player::dataReceived() {
                     }
                 }
                 GameMode mode = static_cast<GameMode>(obj["mode"].toInt());
+
                 emit receivedNewBoard(given, board, mode);
+
                 break;
             }
 
@@ -218,6 +246,10 @@ void Player::dataReceived() {
                 break;
             case BAD_VERSION:
                 emit badVersion(obj["server_version"].toInt(), obj["client_version"].toInt());
+                break;
+
+            case CHANGE_TEAM:
+                emit otherPlayerChangedTeam(obj["player"].toString(), obj["team"].toString());
                 break;
             }
         }

@@ -27,6 +27,7 @@ enum Messages : int {
     BAD_VERSION,
     CHAT_MESSAGE,
     CHANGE_NAME,
+    CHANGE_TEAM,
     DISCONNECT,
     DISCONNECT_OK,
     NEW_PLAYER,
@@ -42,8 +43,9 @@ enum Messages : int {
 };
 
 enum GameMode : int {
-    VERSUS = 1,
-    COOP = 2,
+    NOT_PLAYING,
+    VERSUS,
+    COOP,
 };
 }
 

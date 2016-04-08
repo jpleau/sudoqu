@@ -86,8 +86,8 @@ void MainWindow::disconnectPlayer() {
     ui->chat_area->clear();
     ui->player_list->clear();
     ui->frame->stop();
-    ui->clear_chat->setEnabled(true);
     ui->clear_fields->setEnabled(true);
+    ui->select_team->setEnabled(false);
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
@@ -179,6 +179,7 @@ void MainWindow::startServer(bool acceptConnections) {
     ui->difficulty->setEnabled(true);
     ui->puzzle_coop->setEnabled(true);
     ui->puzzle_versus->setEnabled(true);
+    game->setTeamNames(settings.getTeamNames());
 }
 
 void MainWindow::stopServer() {
@@ -192,6 +193,7 @@ void MainWindow::stopServer() {
 }
 
 void MainWindow::connectToServer(QString host) {
+    ui->select_team->clear();
     if (ui->nickname->text().trimmed().isEmpty()) {
         ui->nickname->setStyleSheet("QLineEdit { background-color: #cc0000; color: #fff; }");
         ui->nickname->setFocus();
@@ -203,7 +205,6 @@ void MainWindow::connectToServer(QString host) {
 #endif
 
     if (host.trimmed().isEmpty()) {
-
         ConnectDialog dialog(settings.getHost(), this);
         if (dialog.exec() == QDialog::Accepted) {
             host = dialog.getHost();
@@ -222,6 +223,10 @@ void MainWindow::connectToServer(QString host) {
         ui->difficulty->setEnabled(true);
     }
 
+    ui->select_team->blockSignals(true);
+    ui->select_team->setEnabled(true);
+    ui->select_team->blockSignals(false);
+
     connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
 
     connect(me.get(), &Player::receivedNewPlayer, [this](int, QString name) {
@@ -231,7 +236,6 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::playerConnected, [=]() {
         ui->chat_send_button->setEnabled(true);
-        ui->clear_chat->setEnabled(true);
         ui->clear_fields->setEnabled(true);
         connect(ui->chat_send_button, &QPushButton::clicked, this, &MainWindow::sendChatMessage);
         connect(ui->chat_text, &QLineEdit::returnPressed, this, &MainWindow::sendChatMessage);
@@ -280,9 +284,23 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::otherPlayerValue, ui->frame, &GameFrame::receiveData);
 
-    connect(ui->clear_chat, &QPushButton::clicked, this, &MainWindow::clearChat);
+    connect(me.get(), &Player::receivedNewBoard, ui->frame,
+            [=](auto &given, auto &board, GameMode mode) { ui->frame->newBoard(given, board, mode); });
 
-    connect(me.get(), &Player::receivedNewBoard, ui->frame, &GameFrame::newBoard);
+    connect(me.get(), &Player::receivedTeamList, [=](QStringList &teams) {
+        ui->select_team->blockSignals(true);
+        for (auto &t : teams) {
+            ui->select_team->addItem(t);
+        }
+        ui->select_team->blockSignals(false);
+    });
+
+    connect(me.get(), &Player::otherPlayerChangedTeam, [=](QString player, QString team) {
+        QString msg = QString(R"(<strong>%1</strong> joined team: <strong>%2</strong><br/>)").arg(player).arg(team);
+        ui->chat_area->appendHtml(msg);
+    });
+
+    connect(ui->select_team, &QComboBox::currentTextChanged, me.get(), &Player::changeTeam);
 
     connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
     connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
