@@ -46,7 +46,14 @@ void Settings::setName(QString n) {
     this->setValue("playerName", n);
 }
 
-QStringList Settings::getTeamNames() const {
-    return this->value("teamNames", QVariant(QStringList())).toStringList();
+QStringList Settings::getTeamNames() {
+    QStringList teams_default = {
+        "Team A", "Team B", "Team C",
+    };
+
+    QStringList teams = this->value("teamNames", QVariant(teams_default)).toStringList();
+    this->setValue("teamNames", teams);
+
+    return teams;
 }
 }

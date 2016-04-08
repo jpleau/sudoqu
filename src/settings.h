@@ -34,7 +34,7 @@ public:
     QString getName() const;
     void setName(QString);
 
-    QStringList getTeamNames() const;
+    QStringList getTeamNames();
 };
 }
 
