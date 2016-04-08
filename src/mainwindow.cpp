@@ -99,6 +99,7 @@ void MainWindow::disconnectPlayer() {
     ui->frame->stop();
     ui->clear_fields->setEnabled(true);
     ui->select_team->setEnabled(false);
+    connectGameAction->setEnabled(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
@@ -199,6 +200,7 @@ void MainWindow::stopServer() {
         game.reset();
     }
     stopServerAction->setEnabled(false);
+    hostGameAction->setEnabled(true);
     ui->start_game->setEnabled(false);
     ui->difficulty->setEnabled(false);
 }
@@ -228,6 +230,7 @@ void MainWindow::connectToServer(QString host) {
     me.reset(new Player(nullptr));
     me->setName(ui->nickname->text());
     me->connectToGame(host);
+    connectGameAction->setEnabled(false);
     disconnectAction->setEnabled(true);
     if (game) {
         ui->start_game->setEnabled(true);
@@ -365,6 +368,7 @@ void MainWindow::clearChat() {
 void MainWindow::setupServer() {
     bool acceptConnections = true;
     startServer(acceptConnections);
+    hostGameAction->setEnabled(false);
     connectToServer("localhost");
 }
 

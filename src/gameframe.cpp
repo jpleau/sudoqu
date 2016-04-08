@@ -96,7 +96,11 @@ void GameFrame::receiveData(int pos, int val) {
 }
 
 void GameFrame::otherPlayerFocus(int id, int pos) {
-    playersFocus[id] = pos;
+    if (pos == -1) {
+        playersFocus.erase(id);
+    } else {
+        playersFocus[id] = pos;
+    }
     repaint();
 }
 

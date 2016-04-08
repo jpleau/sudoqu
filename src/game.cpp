@@ -387,7 +387,14 @@ void Game::dataReceived() {
                     if (active) {
                         obj = sendBoard(mode == COOP ? team : "");
                         sendMessageToPlayer(obj, player);
+
+                        QJsonObject unfocus;
+                        unfocus["message"] = SET_FOCUS;
+                        unfocus["id"] = player->getId();
+                        unfocus["pos"] = -1;
+                        sendMessageToPlayersExcept(unfocus, player);
                     }
+
                     sendStatusChanges();
                 }
                 break;
