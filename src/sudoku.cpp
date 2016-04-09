@@ -50,11 +50,11 @@ void Sudoku::generate(SB::Difficulty difficulty) {
     solution.assign(_solution, _solution + qqwing::BOARD_SIZE);
 }
 
-void Sudoku::setBoard(std::vector<int> &b) {
-    board.setPuzzle(&b[0]);
-    board.solve();
+void Sudoku::setBoard(std::vector<int> &board) {
+    this->board.setPuzzle(&board[0]);
+    this->board.solve();
 
-    const int *_solution = board.getSolution();
+    const int *_solution = this->board.getSolution();
     solution.assign(_solution, _solution + qqwing::BOARD_SIZE);
 }
 
@@ -64,11 +64,5 @@ const std::vector<int> &Sudoku::getPuzzle() const {
 
 const std::vector<int> &Sudoku::getSolution() const {
     return solution;
-}
-
-void Sudoku::print() {
-    const int *puzzle = board.getPuzzle();
-    int size = qqwing::BOARD_SIZE;
-    QVector<int> list = QVector<int>::fromStdVector({puzzle, puzzle + size});
 }
 }

@@ -35,6 +35,10 @@ Game::Game(QObject *parent) : QTcpServer(parent) {
 
 void Game::start_game(SB::Difficulty difficulty, GameMode m) {
     mode = m;
+
+    coop_boards.clear();
+    player_boards.clear();
+
     board.reset(new Sudoku);
     board->generate(difficulty);
 
@@ -69,8 +73,8 @@ void Game::start_game(SB::Difficulty difficulty, GameMode m) {
     sendStatusChanges();
 }
 
-void Game::setTeamNames(QStringList t) {
-    teams = t;
+void Game::setTeamNames(QStringList teams) {
+    this->teams = teams;
 }
 
 void Game::start_server(bool acceptRemote) {
@@ -142,7 +146,7 @@ void Game::clientDisconnected(QTcpSocket *socket) {
     send["message"] = DISCONNECT;
     send["name"] = player->getName();
 
-    sendMessageToPlayersExcept(send, player);
+    sendMessageToAllPlayers(send, player);
 
     players.erase(socket);
 
@@ -153,8 +157,8 @@ void Game::sendMessageToPlayer(QJsonObject &obj, Player *player) {
     Network::sendNetworkMessage(obj, *player);
 }
 
-void Game::sendMessageToAllPlayers(QJsonObject &obj) {
-    auto list = listPlayers();
+void Game::sendMessageToAllPlayers(QJsonObject &obj, Player *except) {
+    auto list = listPlayers(except);
     sendMessageToPlayers(obj, list);
 }
 
@@ -162,11 +166,6 @@ void Game::sendMessageToPlayers(QJsonObject &obj, std::vector<Player *> &players
     for (Player *p : players) {
         sendMessageToPlayer(obj, p);
     }
-}
-
-void Game::sendMessageToPlayersExcept(QJsonObject &obj, Player *except) {
-    auto list = listPlayers(except);
-    sendMessageToPlayers(obj, list);
 }
 
 std::vector<Player *> Game::listPlayers(Player *exceptPlayer) {
@@ -179,9 +178,9 @@ std::vector<Player *> Game::listPlayers(Player *exceptPlayer) {
     return ret;
 }
 
-bool Game::checkSolution(std::vector<int> &board_check) const {
-    std::vector<int> solution = board->getSolution();
-    return board_check == solution;
+bool Game::checkSolution(std::vector<int> &board) const {
+    std::vector<int> solution = this->board->getSolution();
+    return board == solution;
 }
 
 QJsonObject Game::sendBoard(QString team) {
@@ -213,10 +212,10 @@ void Game::assign_team(Player *player, QString team, bool send) {
     }
 }
 
-std::vector<Player *> Game::listPlayersInTeam(QString t, Player *except) {
+std::vector<Player *> Game::listPlayersInTeam(QString team, Player *except) {
     std::vector<Player *> ret;
     for (auto p : players) {
-        if (p.second.get() != except && p.second->getTeam() == t) {
+        if (p.second.get() != except && p.second->getTeam() == team) {
             ret.push_back(p.second.get());
         }
     }
@@ -328,7 +327,7 @@ void Game::dataReceived() {
                 break;
             case CHAT_MESSAGE:
                 obj["name"] = player->getName();
-                sendMessageToPlayersExcept(obj, player);
+                sendMessageToAllPlayers(obj, player);
                 break;
 
             case DISCONNECT:
@@ -416,7 +415,7 @@ void Game::dataReceived() {
                         unfocus["message"] = SET_FOCUS;
                         unfocus["id"] = player->getId();
                         unfocus["pos"] = -1;
-                        sendMessageToPlayersExcept(unfocus, player);
+                        sendMessageToAllPlayers(unfocus, player);
                     }
 
                     sendStatusChanges();

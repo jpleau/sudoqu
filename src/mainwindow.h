@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SUDOQU_MAINWINDOW_H
+#define SUDOQU_MAINWINDOW_H
 
 #include "constants.h"
 #include "settings.h"

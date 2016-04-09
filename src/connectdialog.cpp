@@ -20,6 +20,8 @@
 
 #include "ui_connectdialog.h"
 
+namespace Sudoqu {
+
 ConnectDialog::ConnectDialog(QString host, QWidget *parent) : QDialog(parent), ui(new Ui::ConnectDialog) {
     ui->setupUi(this);
     ui->host->setText(host);
@@ -31,4 +33,5 @@ ConnectDialog::~ConnectDialog() {
 
 QString ConnectDialog::getHost() const {
     return ui->host->text();
+}
 }

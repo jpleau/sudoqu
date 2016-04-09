@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GAMEFRAME_H
-#define GAMEFRAME_H
+#ifndef SUDOQU_GAMEFRAME_H
+#define SUDOQU_GAMEFRAME_H
 
 #include "constants.h"
 
@@ -34,22 +34,16 @@ public:
     GameFrame(QWidget * = nullptr);
 
     void newBoard(std::vector<int> &, std::vector<int> &, GameMode);
+    void stop();
 
     int getAt(int) const;
     void setAt(int, int, bool = false);
-
     int getGivenAt(int) const;
 
-    void stop();
-
     bool isGameActive() const;
-
     void cheat();
-
     void clearBoard();
-
     void receiveData(int, int);
-
     void otherPlayerFocus(int, int);
 
 signals:
@@ -68,18 +62,16 @@ private:
     std::vector<int> board;
     std::vector<int> given;
     GameMode mode;
+    int focused = -1;
 
+    std::map<int, int> playersFocus;
     std::map<int, int> key_map = {
         {Qt::Key_1, 1}, {Qt::Key_2, 2}, {Qt::Key_3, 3}, {Qt::Key_4, 4}, {Qt::Key_5, 5},
         {Qt::Key_6, 6}, {Qt::Key_7, 7}, {Qt::Key_8, 8}, {Qt::Key_9, 9},
     };
 
-    int focused = -1;
-
     void sendData(int = -1, int = -1);
-
-    std::map<int, int> playersFocus;
 };
 }
 
-#endif // GAMEFRAME_H
+#endif

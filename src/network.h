@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef SUDOQU_NETWORK_H
+#define SUDOQU_NETWORK_H
 
 #include "constants.h"
 
@@ -27,9 +27,28 @@ class QTcpSocket;
 
 namespace Sudoqu {
 
+/**
+ * @class Network
+ * @brief Static methods for sending and reading JSON over network
+ */
 class Network {
 public:
+    /**
+     * @fn static void sendNetworkMessage(QJsonObject &, QTcpSocket *)
+     * @brief Sends a network message encoded in JSON
+     *
+     * @param QJsonObject obj The QJsonObject that will be encoded in JSON
+     * @param QTcpSocket* socket The client which will receive this message
+     */
     static void sendNetworkMessage(QJsonObject &, QTcpSocket *);
+
+    /**
+     * @fn static QJsonObject readNetworkMessage(QString)
+     * @brief Reads a JSON encoded message
+     *
+     * @param QString data The JSON string received over network
+     * @return a Qt JSON object
+     */
     static QJsonObject readNetworkMessage(QString);
 };
 }

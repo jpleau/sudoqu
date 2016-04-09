@@ -16,14 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTDIALOG_H
-#define CONNECTDIALOG_H
+#ifndef SUDOQU_CONNECTDIALOG_H
+#define SUDOQU_CONNECTDIALOG_H
 
 #include <QDialog>
 
 namespace Ui {
 class ConnectDialog;
 }
+
+namespace Sudoqu {
 
 class ConnectDialog : public QDialog {
     Q_OBJECT
@@ -37,5 +39,6 @@ public:
 private:
     Ui::ConnectDialog *ui;
 };
+}
 
-#endif // CONNECTDIALOG_H
+#endif

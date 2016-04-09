@@ -49,8 +49,8 @@ void Player::disconnectFromServer() {
     sendMessage(obj);
 }
 
-void Player::setName(QString n) {
-    name = n;
+void Player::setName(QString name) {
+    this->name = name;
 }
 
 QString Player::getName() const {
@@ -61,19 +61,23 @@ int Player::getId() const {
     return id;
 }
 
-void Player::sendChatMessage(QString msg) {
+void Player::sendChatMessage(QString message) {
     QJsonObject obj;
     obj["message"] = CHAT_MESSAGE;
-    obj["text"] = msg;
+    obj["text"] = message;
     sendMessage(obj);
 }
 
-void Player::sendCount(int n, int pos, int val) {
+Sudoqu::Player::operator QTcpSocket *() {
+    return socket.get();
+}
+
+void Player::sendCount(int number, int pos, int value) {
     QJsonObject obj;
     obj["message"] = NEW_COUNT;
-    obj["count"] = n;
+    obj["count"] = number;
     obj["pos"] = pos;
-    obj["val"] = val;
+    obj["val"] = value;
     sendMessage(obj);
 }
 
@@ -125,8 +129,8 @@ void Player::changeName(QString new_name) {
     sendMessage(obj);
 }
 
-void Player::changeTeam(QString t) {
-    team = t;
+void Player::changeTeam(QString team) {
+    this->team = team;
     QJsonObject obj;
     obj["message"] = CHANGE_TEAM;
     obj["team"] = team;

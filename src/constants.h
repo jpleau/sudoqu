@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef SUDOQU_CONSTANTS_H
+#define SUDOQU_CONSTANTS_H
 
 #define SUDOQU_VERSION 2
 

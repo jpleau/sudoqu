@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CHATBOX_H
-#define CHATBOX_H
+#ifndef SUDOQU_CHATBOX_H
+#define SUDOQU_CHATBOX_H
 
 #include <QLineEdit>
 

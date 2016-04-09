@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUDOKU_H
-#define SUDOKU_H
+#ifndef SUDOQU_SUDOKU_H
+#define SUDOQU_SUDOKU_H
 
 #include <qqwing.hpp>
 
@@ -27,19 +27,48 @@ namespace Sudoqu {
 
 using SB = qqwing::SudokuBoard;
 
+/**
+ * @brief The Sudoku class, a wrapper around the qqwing library
+ */
 class Sudoku {
 public:
     Sudoku();
+    /**
+     * @brief generate a new Sudoku board
+     * @param difficulty how difficult we want the board to be
+     */
     void generate(SB::Difficulty = SB::EASY);
+
+    /**
+     * @brief assign a puzzle to the board
+     * @param board the puzzle we want to assign
+     */
     void setBoard(std::vector<int> &);
+
+    /**
+     * @return the current puzzle
+     */
     const std::vector<int> &getPuzzle() const;
+
+    /**
+     * @return the solution to the current puzzle
+     */
     const std::vector<int> &getSolution() const;
-    void print();
 
 private:
+    /**
+     * @brief a sudoku board (qqwing library)
+     */
     qqwing::SudokuBoard board;
 
+    /**
+     * @brief the current puzzle
+     */
     std::vector<int> puzzle;
+
+    /**
+     * @brief the solution to the current puzzle
+     */
     std::vector<int> solution;
 };
 }
