@@ -56,6 +56,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     };
 
     we_move_unseen.setMedia(QUrl("qrc:/konami.ogg"));
+
+    connect(&we_move_unseen, &QMediaPlayer::stateChanged, [=](auto state) {
+        if (state == QMediaPlayer::StoppedState) {
+            we_move_unseen.setMedia(QUrl("qrc:/konami.ogg"));
+        }
+    });
 }
 
 MainWindow::~MainWindow() {
@@ -77,6 +83,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 #ifdef DEBUG
     if (event->key() == Qt::Key_L) {
+        we_move_unseen.play();
         auto modifiers = event->modifiers();
         if (modifiers & Qt::AltModifier && modifiers & Qt::ControlModifier) {
             ui->frame->cheat();
