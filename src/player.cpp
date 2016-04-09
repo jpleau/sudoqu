@@ -189,12 +189,9 @@ void Player::dataReceived() {
 
             case STATUS_CHANGE: {
                 std::vector<StatusChange> list;
-                auto players = obj["players"].toArray();
-                auto counts = obj["counts"].toArray();
-                auto done = obj["done"].toArray();
 
-                for (int i = 0; i < obj["players"].toArray().size(); ++i) {
-                    list.emplace_back(done[i].toBool(), counts[i].toInt(), players[i].toString());
+                for (auto change : obj["changes"].toArray()) {
+                    list.emplace_back(change.toObject());
                 }
 
                 emit receivedStatusChanges(list, obj["count_total"].toInt());
@@ -266,8 +263,5 @@ void Player::dataReceived() {
             }
         }
     }
-}
-
-StatusChange::StatusChange(bool d, int c, QString n) : done(d), count(c), name(n) {
 }
 }

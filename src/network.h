@@ -51,6 +51,39 @@ public:
      */
     static QJsonObject readNetworkMessage(QString);
 };
+
+/**
+ * @struct StatusChange
+ * @brief Contains information that should be displayed in the game status pane
+ */
+struct StatusChange {
+    /**
+     * @brief done check if the player / team has finished the game
+     */
+    bool done;
+
+    /**
+     * @brief count number of squares that each player / team has entered
+     */
+    int count;
+
+    /**
+     * @brief name the name of the player / team
+     */
+    QString name;
+
+    /**
+     * @return a json object of the status change
+     */
+    QJsonObject toJson() const;
+
+    /**
+     * @brief construct StatusChange from a QJSonObject
+     */
+    StatusChange(const QJsonObject &);
+
+    StatusChange(bool, int, QString);
+};
 }
 
 #endif

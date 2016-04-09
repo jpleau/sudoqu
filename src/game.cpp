@@ -18,8 +18,6 @@
 
 #include "game.h"
 
-#include "network.h"
-
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTcpSocket>
@@ -246,51 +244,41 @@ std::vector<Player *> Game::listPlayersInTeam(QString team, Player *except) {
 }
 
 void Game::sendStatusChanges(Player *except) {
-    QJsonArray list_teams;
-    QJsonArray list_players;
-    QJsonArray list_count;
-    QJsonArray list_done;
-
-    QJsonObject send;
-
-    send["count_total"] = active ? 81 - board->getGivenCount() : 0;
+    QJsonArray changes;
+    QJsonObject obj;
 
     if (mode != COOP) {
         for (auto &p : players) {
             Player *player = p.second.get();
             if (player != except) {
-                list_players.append(player->getName());
-                if (active) {
-                    list_count.append(getCount(player_boards[player]));
-                    list_done.append(checkSolution(player_boards[player]));
-                } else {
-                    list_done.append(false);
-                }
+                bool done = active && checkSolution(player_boards[player]);
+                int count = !active ? 0 : getCount(player_boards[player]);
+                changes.push_back(StatusChange(done, count, player->getName()).toJson());
             }
         }
-    } else {
-        for (auto team : teams) {
-            auto players_in_team = listPlayersInTeam(team);
+    } else { /*
+          for (auto team : teams) {
+              auto players_in_team = listPlayersInTeam(team);
 
-            if (!players_in_team.empty()) {
-                QStringList player_names;
-                for (auto player : players_in_team) {
-                    player_names.push_back(player->getName());
-                }
-                QString fullName = QString("%1: %2").arg(team).arg(player_names.join(", "));
-                list_players.append(fullName);
-                list_count.append(getCount(coop_boards[team]));
-                list_done.append(checkSolution(coop_boards[team]));
-            }
-        }
+              if (!players_in_team.empty()) {
+                  QStringList player_names;
+                  for (auto player : players_in_team) {
+                      player_names.push_back(player->getName());
+                  }
+                  QString fullName = QString("%1: %2").arg(team).arg(player_names.join(", "));
+                                  changes
+                  list_players.append(fullName);
+                  list_count.append(getCount(coop_boards[team]));
+                  list_done.append(checkSolution(coop_boards[team]));
+              }
+          }*/
     }
 
-    send["message"] = STATUS_CHANGE;
-    send["players"] = list_players;
-    send["counts"] = list_count;
-    send["done"] = list_done;
+    obj["message"] = STATUS_CHANGE;
+    obj["count_total"] = active ? 81 - board->getGivenCount() : 0;
+    obj["changes"] = changes;
 
-    sendMessageToAllPlayers(send);
+    sendMessageToAllPlayers(obj);
 }
 
 void Game::dataReceived() {

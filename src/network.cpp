@@ -34,4 +34,19 @@ QJsonObject Network::readNetworkMessage(QString data) {
     QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
     return doc.object();
 }
+
+StatusChange::StatusChange(const QJsonObject &json)
+    : done(json["done"].toBool()), count(json["count"].toInt()), name(json["name"].toString()) {
+}
+
+QJsonObject StatusChange::toJson() const {
+    QJsonObject json;
+    json["done"] = done;
+    json["count"] = count;
+    json["name"] = name;
+    return json;
+}
+
+StatusChange::StatusChange(bool d, int c, QString n) : done(d), count(c), name(n) {
+}
 }

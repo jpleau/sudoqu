@@ -20,6 +20,7 @@
 #define SUDOQU_PLAYER_H
 
 #include "constants.h"
+#include "network.h"
 
 #include <QObject>
 #include <QString>
@@ -34,29 +35,6 @@ namespace Sudoqu {
 
 struct SocketDeleter {
     void operator()(QTcpSocket *);
-};
-
-/**
- * @struct StatusChange
- * @brief Contains information that should be displayed in the game status pane
- */
-struct StatusChange {
-    /**
-     * @brief done check if the player / team has finished the game
-     */
-    bool done;
-
-    /**
-     * @brief count number of squares that each player / team has entered
-     */
-    int count;
-
-    /**
-     * @brief name the name of the player / team
-     */
-    QString name;
-
-    StatusChange(bool, int, QString);
 };
 
 /**
