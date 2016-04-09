@@ -45,6 +45,7 @@ public:
     void clearBoard();
     void receiveData(int, int);
     void otherPlayerFocus(int, int);
+    void gameOverWinner();
 
 signals:
     void sendFocusedSquare(int);
@@ -59,6 +60,7 @@ protected:
 
 private:
     bool active;
+    bool gameOver;
     std::vector<int> board;
     std::vector<int> given;
 

@@ -30,6 +30,7 @@ enum Messages : int {
     CHANGE_TEAM,
     DISCONNECT,
     DISCONNECT_OK,
+    GAME_OVER_WINNER,
     NEW_PLAYER,
     NEW_GAME,
     NEW_VALUE,
@@ -37,7 +38,6 @@ enum Messages : int {
     SEND_NAME,
     SERVER_DOWN,
     SET_FOCUS,
-    TEST_SOLUTION,
     YOUR_ID,
 };
 

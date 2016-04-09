@@ -172,6 +172,16 @@ private:
      */
     int getCount(std::vector<int> &);
 
+    /**
+     * @brief send the game over message to every one that the team currently being processed has won
+     */
+    void gameOverWinner(QString);
+
+    /**
+     * @brief send the game over message to every one that the player currently being processed has won
+     */
+    void gameOverWinner(Player *);
+
 private slots:
     /**
      * @brief called when a new client (socket) connected to the server

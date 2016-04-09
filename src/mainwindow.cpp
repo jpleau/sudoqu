@@ -83,7 +83,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 #ifdef DEBUG
     if (event->key() == Qt::Key_L) {
-        we_move_unseen.play();
         auto modifiers = event->modifiers();
         if (modifiers & Qt::AltModifier && modifiers & Qt::ControlModifier) {
             ui->frame->cheat();
@@ -342,6 +341,12 @@ void MainWindow::connectToServer(QString host) {
     connect(disconnectAction.get(), &QAction::triggered, me.get(), &Player::disconnectFromServer);
     connect(me.get(), &Player::otherPlayerFocus, ui->frame, &GameFrame::otherPlayerFocus);
     connect(me.get(), &Player::badVersion, this, &MainWindow::badVersion);
+
+    connect(me.get(), &Player::gameOverWinner, [=](QString winner) {
+        ui->frame->gameOverWinner();
+        QString msg = QString("<strong>%1</strong> has won the game !<br/>").arg(winner);
+        ui->chat_area->appendHtml(msg);
+    });
 }
 
 void MainWindow::changeName() {

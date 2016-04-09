@@ -134,7 +134,7 @@ public:
 
 signals:
     /**
-     * @brief server tells the player about a new connected player
+     * @brief emitted after a new player has connected
      * @param int id the new player's id
      * @param QString name the new player's name
      */
@@ -151,26 +151,26 @@ signals:
     void playerDisconnected();
 
     /**
-     * @brief received a chat message from the server
+     * @brief emitted after receiving a chat message from the server
      * @param QString name the player who sent the message
      * @param QString message the actual chat message
      */
     void receivedChatMessage(QString, QString);
 
     /**
-     * @brief received status changes (for the game info panel)
+     * @brief emitted after receiving status changes (for the game info panel)
      * @param list the list of Sudoqu::StatusChange
      * @param int count_total the number of total squares
      */
     void receivedStatusChanges(std::vector<StatusChange> &, int);
 
     /**
-     * @brief received when a player disconnected
+     * @brief emitted after a player has disconnected
      * @param QString name the name of the disconnect player
      */
     void otherPlayerDisconnected(QString);
     /**
-     * @brief received a new board
+     * @brief emitted after receiving a new board
      * @param given the list of given for the current game
      * @param board the current board for the player / team
      * @param Sudoqu::GameMode mode the game mode (versus / coop)
@@ -178,7 +178,7 @@ signals:
     void receivedNewBoard(std::vector<int> &, std::vector<int> &, GameMode);
 
     /**
-     * @brief another player changed their name on the server
+     * @brief emitted after another player changed their name on the server
      * @param int id the player's id
      * @param QString old_name player's old name
      * @param QString new_name player's new name
@@ -186,38 +186,44 @@ signals:
     void otherPlayerChangedName(int, QString, QString);
 
     /**
-     * @brief received a new value from a new player (coop mode)
+     * @brief emitted after receiving a new value from a new player (coop mode)
      * @param int pos the position that is updated
      * @param int value the new value
      */
     void otherPlayerValue(int, int);
 
     /**
-     * @brief received a new focus position for a player (coop mode)
+     * @brief emitted after receiving a new focus position for a player (coop mode)
      * @param int id other player's id
      * @param int pos other player's new focus
      */
     void otherPlayerFocus(int, int);
 
     /**
-     * @brief received when the player's game version does match the server's
+     * @brief emitted when the player's game version does match the server's
      * @param int server_version the version of the game the server is running
      * @param int client_version the version of the game the player is running
      */
     void badVersion(int, int);
 
     /**
-     * @brief received the team list from the server
+     * @brief emitted after receiving the team list from the server
      * @param QStringList teams the list of teams
      */
     void receivedTeamList(QStringList &);
 
     /**
-     * @brief received when another player changes team
+     * @brief emitted after another player changed their team
      * @param QString player other player's name
      * @param QString team other player's new team
      */
     void otherPlayerChangedTeam(QString, QString);
+
+    /**
+     * @brief emitted when the server declared one player or one team as winner
+     * @param QString winner the winner (team or player)
+     */
+    void gameOverWinner(QString);
 
 private:
     bool done = false;

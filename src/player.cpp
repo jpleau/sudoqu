@@ -250,6 +250,19 @@ void Player::dataReceived() {
             case CHANGE_TEAM:
                 emit otherPlayerChangedTeam(obj["player"].toString(), obj["team"].toString());
                 break;
+
+            case GAME_OVER_WINNER: {
+                QString winner;
+                if (obj.find("team") != obj.end()) {
+                    winner = "Team " + obj["team"].toString();
+                } else {
+                    winner = obj["player"].toString();
+                }
+
+                emit gameOverWinner(winner);
+
+                break;
+            }
             }
         }
     }

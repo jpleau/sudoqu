@@ -220,6 +220,21 @@ int Game::getCount(std::vector<int> &board) {
     return count;
 }
 
+void Game::gameOverWinner(QString team) {
+    auto players = listPlayersInTeam(team);
+    QJsonObject obj;
+    obj["message"] = GAME_OVER_WINNER;
+    obj["team"] = team;
+    sendMessageToPlayers(obj, players);
+}
+
+void Game::gameOverWinner(Player *player) {
+    QJsonObject obj;
+    obj["message"] = GAME_OVER_WINNER;
+    obj["player"] = player->getName();
+    sendMessageToAllPlayers(obj);
+}
+
 std::vector<Player *> Game::listPlayersInTeam(QString team, Player *except) {
     std::vector<Player *> ret;
     for (auto p : players) {
@@ -344,8 +359,14 @@ void Game::dataReceived() {
                         auto list_players = listPlayersInTeam(team, player);
                         sendMessageToPlayers(obj, list_players);
                         coop_boards[team][pos] = val;
+                        if (checkSolution(coop_boards[team])) {
+                            gameOverWinner(team);
+                        }
                     } else {
                         player_boards[player][pos] = val;
+                        if (checkSolution(player_boards[player])) {
+                            gameOverWinner(player);
+                        }
                     }
                 }
 

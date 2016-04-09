@@ -35,6 +35,7 @@ void GameFrame::newBoard(std::vector<int> &g, std::vector<int> &b, GameMode m) {
     given = g;
     board = b;
     active = true;
+    gameOver = false;
     mode = m;
     repaint();
     emit setGameMode(mode);
@@ -100,6 +101,12 @@ void GameFrame::otherPlayerFocus(int id, int pos) {
     } else {
         playersFocus[id] = pos;
     }
+    repaint();
+}
+
+void GameFrame::gameOverWinner() {
+    gameOver = true;
+    focused = -1;
     repaint();
 }
 
@@ -187,7 +194,7 @@ void GameFrame::paintEvent(QPaintEvent *) {
 }
 
 void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
-    if (!active) {
+    if (!active || gameOver) {
         return;
     }
 
@@ -221,7 +228,7 @@ void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void GameFrame::keyPressEvent(QKeyEvent *event) {
-    if (focused == -1) {
+    if (focused == -1 || gameOver) {
         return;
     }
     int key = event->key();
