@@ -32,7 +32,6 @@ enum Messages : int {
     DISCONNECT_OK,
     NEW_PLAYER,
     NEW_GAME,
-    NEW_COUNT,
     NEW_VALUE,
     STATUS_CHANGE,
     SEND_NAME,

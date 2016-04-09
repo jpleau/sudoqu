@@ -321,8 +321,9 @@ void MainWindow::connectToServer(QString host) {
 
     connect(ui->select_team, &QComboBox::currentTextChanged, me.get(), &Player::changeTeam);
 
-    connect(ui->frame, &GameFrame::setCount, me.get(), &Player::sendCount);
-    connect(ui->frame, &GameFrame::completeBoard, me.get(), &Player::testBoard);
+    connect(ui->frame, &GameFrame::sendValue, me.get(), &Player::sendValue);
+    connect(ui->frame, &GameFrame::sendValues, me.get(), &Player::sendValues);
+
     connect(ui->frame, &GameFrame::sendFocusedSquare, me.get(), &Player::sendFocusedSquare);
     connect(ui->frame, &GameFrame::setGameMode, [=](GameMode mode) {
         if (mode == COOP) {

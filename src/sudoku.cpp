@@ -65,4 +65,8 @@ const std::vector<int> &Sudoku::getPuzzle() const {
 const std::vector<int> &Sudoku::getSolution() const {
     return solution;
 }
+
+int Sudoku::getGivenCount() {
+    return board.getGivenCount();
+}
 }

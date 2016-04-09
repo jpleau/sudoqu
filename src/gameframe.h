@@ -47,10 +47,10 @@ public:
     void otherPlayerFocus(int, int);
 
 signals:
-    void setCount(int, int, int);
-    void completeBoard(std::vector<int> &, int);
     void sendFocusedSquare(int);
     void setGameMode(GameMode);
+    void sendValue(int = -1, int = -1);
+    void sendValues(std::vector<int> &);
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -61,16 +61,16 @@ private:
     bool active;
     std::vector<int> board;
     std::vector<int> given;
+
     GameMode mode;
     int focused = -1;
 
     std::map<int, int> playersFocus;
+
     std::map<int, int> key_map = {
         {Qt::Key_1, 1}, {Qt::Key_2, 2}, {Qt::Key_3, 3}, {Qt::Key_4, 4}, {Qt::Key_5, 5},
         {Qt::Key_6, 6}, {Qt::Key_7, 7}, {Qt::Key_8, 8}, {Qt::Key_9, 9},
     };
-
-    void sendData(int = -1, int = -1);
 };
 }
 

@@ -55,6 +55,11 @@ public:
      */
     const std::vector<int> &getSolution() const;
 
+    /**
+     * @return the number of givens for the current board;
+     */
+    int getGivenCount();
+
 private:
     /**
      * @brief a sudoku board (qqwing library)

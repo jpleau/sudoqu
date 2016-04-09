@@ -72,12 +72,20 @@ Sudoqu::Player::operator QTcpSocket *() {
     return socket.get();
 }
 
-void Player::sendCount(int number, int pos, int value) {
+void Player::sendValue(int pos, int value) {
     QJsonObject obj;
-    obj["message"] = NEW_COUNT;
-    obj["count"] = number;
+    obj["message"] = NEW_VALUE;
     obj["pos"] = pos;
     obj["val"] = value;
+    sendMessage(obj);
+}
+
+void Player::sendValues(std::vector<int> &values) {
+    QJsonObject obj;
+    obj["message"] = NEW_VALUE;
+    std::list<QVariant> list(values.begin(), values.end());
+    QJsonArray array = QJsonArray::fromVariantList(QVariantList::fromStdList(list));
+    obj["values"] = array;
     sendMessage(obj);
 }
 
@@ -106,19 +114,6 @@ void Player::setDone(bool d) {
 
 bool Player::isDone() const {
     return done;
-}
-
-void Player::testBoard(std::vector<int> &board, int count) {
-    QJsonObject obj;
-    std::list<QVariant> list(board.begin(), board.end());
-    QList<QVariant> puzzle_json = QList<QVariant>::fromStdList(list);
-    QJsonArray array = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list));
-
-    obj["message"] = TEST_SOLUTION;
-    obj["board"] = array;
-    obj["count"] = count;
-
-    sendMessage(obj);
 }
 
 void Player::changeName(QString new_name) {

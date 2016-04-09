@@ -47,7 +47,7 @@ int GameFrame::getAt(int pos) const {
 void GameFrame::setAt(int pos, int val, bool send_network) {
     board[static_cast<size_t>(pos)] = val;
     if (send_network) {
-        sendData(pos, val);
+        emit sendValue(pos, val);
     }
 }
 
@@ -78,15 +78,14 @@ void GameFrame::cheat() {
         }
     }
 
-    sendData();
-
+    emit sendValues(board);
     repaint();
 }
 
 void GameFrame::clearBoard() {
     board = given;
     focused = -1;
-    sendData();
+    emit sendValues(board);
     repaint();
 }
 
@@ -238,35 +237,5 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
     }
 
     repaint();
-}
-
-void GameFrame::sendData(int pos, int val) {
-    if (mode == VERSUS) {
-        pos = val = -1;
-    }
-
-    int given_filled = 0;
-    int board_filled = 0;
-    int player_filled = 0;
-
-    for (int i : board) {
-        if (i > 0) {
-            ++board_filled;
-        }
-    }
-
-    for (int i : given) {
-        if (i > 0) {
-            ++given_filled;
-        }
-    }
-
-    player_filled = board_filled - given_filled;
-
-    if (board_filled == 81) {
-        emit completeBoard(board, player_filled);
-    } else {
-        emit setCount(player_filled, pos, val);
-    }
 }
 }

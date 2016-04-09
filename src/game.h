@@ -65,8 +65,6 @@ public:
     void setTeamNames(QStringList);
 
 private:
-    std::map<int, int> counts;
-
     /**
      * @brief incremental ID to give to new players who connect
      */
@@ -147,7 +145,7 @@ private:
      * the one responsible for sending the message)
      * @return the list of connected players in the team, except the one in paramater if passed
      */
-    std::vector<Player *> listPlayersInTeam(QString, Player *);
+    std::vector<Player *> listPlayersInTeam(QString, Player * = nullptr);
 
     /**
      * @param board the board we want to test
@@ -168,6 +166,11 @@ private:
      * @param send if this action will be sent over network to other players
      */
     void assign_team(Player *, QString, bool);
+
+    /**
+     * @return the number of values entered in a board that were not givens
+     */
+    int getCount(std::vector<int> &);
 
 private slots:
     /**

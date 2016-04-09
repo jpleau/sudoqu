@@ -81,8 +81,6 @@ public:
     QString getTeam() const;
     void setTeam(const QString &value);
 
-    void testBoard(std::vector<int> &, int);
-
     /**
      * @brief connectToGame connect to the server
      * @param host the host to connect to
@@ -103,11 +101,17 @@ public:
     operator QTcpSocket *();
 
     /**
-     * @brief sendCount send new input for the player's board
+     * @brief send new value for the player's board
      * @param int pos the square the player changed
      * @param int value the value of the square changed
      */
-    void sendCount(int, int, int);
+    void sendValue(int, int);
+
+    /**
+ * @brief send a complete board to the server
+ * @param board the values
+ */
+    void sendValues(std::vector<int> &);
 
     /**
      * @brief changeName change the player's name, and send the new name to the server
