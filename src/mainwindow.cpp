@@ -28,8 +28,7 @@
 
 namespace Sudoqu {
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), we_move_unseen("://data/we_move_unseen.wav") {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
     ui->nickname->setText(settings.getName());
@@ -55,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent)
         Qt::Key_Up,   Qt::Key_Up,    Qt::Key_Down, Qt::Key_Down, Qt::Key_Left,   Qt::Key_Right,
         Qt::Key_Left, Qt::Key_Right, Qt::Key_B,    Qt::Key_A,    Qt::Key_Return,
     };
+
+    we_move_unseen.setMedia(QUrl("qrc:/konami.ogg"));
 }
 
 MainWindow::~MainWindow() {

@@ -24,7 +24,7 @@
 
 #include <QActionGroup>
 #include <QMainWindow>
-#include <QSound>
+#include <QMediaPlayer>
 
 #include <memory>
 
@@ -69,7 +69,7 @@ private:
     // Konami code
     int konamiCount = 0;
     QList<Qt::Key> konamiKeys;
-    QSound we_move_unseen;
+    QMediaPlayer we_move_unseen;
 
     // Menu
     std::unique_ptr<QActionGroup> newGameGroup;
