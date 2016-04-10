@@ -68,7 +68,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event) {
+void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     if (konamiCount < konamiKeys.size()) {
         if (konamiKeys[konamiCount] == event->key()) {
             ++konamiCount;
@@ -82,7 +82,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         }
     }
 #ifdef DEBUG
-    if (event->key() == Qt::Key_L) {
+    if (ui->frame->isGameActive() && event->key() == Qt::Key_L) {
         auto modifiers = event->modifiers();
         if (modifiers & Qt::AltModifier && modifiers & Qt::ControlModifier) {
             ui->frame->cheat();

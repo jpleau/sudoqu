@@ -230,21 +230,71 @@ void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void GameFrame::keyPressEvent(QKeyEvent *event) {
+    int key = event->key();
+
     if (focused == -1 || gameOver) {
         return;
     }
-    int key = event->key();
-    if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
-        setAt(focused, 0, true);
-    } else if (key == Qt::Key_Escape) {
-        focused = -1;
+
+    if (key == Qt::Key_Right || key == Qt::Key_Left || key == Qt::Key_Down || key == Qt::Key_Up) {
+        int row = focused / 9;
+        int col = focused % 9;
+
+        switch (key) {
+        case Qt::Key_Right:
+            col = moveFocus(1, false);
+            break;
+        case Qt::Key_Left:
+            col = moveFocus(-1, false);
+            break;
+        case Qt::Key_Up:
+            row = moveFocus(-1, true);
+            break;
+        case Qt::Key_Down:
+            row = moveFocus(1, true);
+            break;
+        }
+
+        focused = row * 9 + col;
+
     } else {
-        auto check = key_map.find(key);
-        if (check != key_map.end()) {
-            setAt(focused, check->second, true);
+        if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
+            setAt(focused, 0, true);
+        } else if (key == Qt::Key_Escape) {
+            focused = -1;
+        } else {
+            auto check = key_map.find(key);
+            if (check != key_map.end()) {
+                setAt(focused, check->second, true);
+            }
         }
     }
-
     repaint();
+}
+
+int GameFrame::moveFocus(int delta, bool moving_row) {
+    int row = focused / 9;
+    int col = focused % 9;
+
+    int ret = moving_row ? row : col;
+
+    if (delta != 0) {
+        int tmp = moving_row ? row : col;
+        while (true) {
+            tmp += delta;
+            if (tmp < 0 || tmp > 8) {
+                delta *= -1;
+                break;
+            }
+            int pos = (moving_row ? tmp : row) * 9 + (moving_row ? col : tmp);
+            if (getGivenAt(pos) > 0) {
+                continue;
+            } else {
+                ret = tmp;
+                break;
+            }
+        }
+    }
+    return ret;
 }
 }
