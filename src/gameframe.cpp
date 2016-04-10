@@ -283,7 +283,6 @@ int GameFrame::moveFocus(int delta, bool moving_row) {
         while (true) {
             tmp += delta;
             if (tmp < 0 || tmp > 8) {
-                delta *= -1;
                 break;
             }
             int pos = (moving_row ? tmp : row) * 9 + (moving_row ? col : tmp);
