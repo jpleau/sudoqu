@@ -90,8 +90,10 @@ void GameFrame::clearBoard() {
     repaint();
 }
 
-void GameFrame::receiveData(int pos, int val) {
-    setAt(pos, val, false);
+void GameFrame::otherPlayerValues(std::map<int, int> &values) {
+    for (auto value : values) {
+        setAt(value.first, value.second, false);
+    }
     repaint();
 }
 

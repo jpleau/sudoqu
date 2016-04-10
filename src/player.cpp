@@ -233,9 +233,22 @@ void Player::dataReceived() {
                 emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
                 break;
 
-            case NEW_VALUE:
-                emit otherPlayerValue(obj["pos"].toInt(), obj["val"].toInt());
+            case NEW_VALUE: {
+                std::map<int, int> values;
+
+                if (obj.find("values") == obj.end()) {
+                    values[obj["pos"].toInt()] = obj["val"].toInt();
+                } else {
+                    auto tmp_values = obj["values"].toArray();
+                    for (int i = 0; i < tmp_values.size(); ++i) {
+                        values[i] = tmp_values[i].toInt();
+                    }
+                }
+
+                emit otherPlayerValues(values);
+
                 break;
+            }
 
             case SET_FOCUS:
                 emit otherPlayerFocus(obj["id"].toInt(), obj["pos"].toInt());

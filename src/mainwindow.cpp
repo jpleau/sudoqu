@@ -104,7 +104,7 @@ void MainWindow::disconnectPlayer() {
     ui->chat_area->clear();
     ui->player_list->clear();
     ui->frame->stop();
-    ui->clear_fields->setEnabled(true);
+    ui->clear_fields->setEnabled(false);
     ui->select_team->setEnabled(false);
     connectGameAction->setEnabled(true);
 }
@@ -303,7 +303,7 @@ void MainWindow::connectToServer(QString host) {
         ui->chat_area->appendHtml(msg);
     });
 
-    connect(me.get(), &Player::otherPlayerValue, ui->frame, &GameFrame::receiveData);
+    connect(me.get(), &Player::otherPlayerValues, ui->frame, &GameFrame::otherPlayerValues);
 
     connect(me.get(), &Player::receivedNewBoard, ui->frame, [=](auto &given, auto &board, GameMode mode) {
         ui->select_team->blockSignals(true);
@@ -333,9 +333,9 @@ void MainWindow::connectToServer(QString host) {
     connect(ui->frame, &GameFrame::sendFocusedSquare, me.get(), &Player::sendFocusedSquare);
     connect(ui->frame, &GameFrame::setGameMode, [=](GameMode mode) {
         if (mode == COOP) {
-            ui->clear_fields->setEnabled(false);
+            ui->puzzle_coop->setChecked(true);
         } else {
-            ui->clear_fields->setEnabled(true);
+            ui->puzzle_versus->setChecked(true);
         }
     });
     connect(disconnectAction.get(), &QAction::triggered, me.get(), &Player::disconnectFromServer);

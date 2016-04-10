@@ -43,7 +43,7 @@ public:
     bool isGameActive() const;
     void cheat();
     void clearBoard();
-    void receiveData(int, int);
+    void otherPlayerValues(std::map<int, int> &);
     void otherPlayerFocus(int, int);
     void gameOverWinner();
 

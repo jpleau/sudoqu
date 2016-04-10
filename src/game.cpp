@@ -256,22 +256,20 @@ void Game::sendStatusChanges(Player *except) {
                 changes.push_back(StatusChange(done, count, player->getName()).toJson());
             }
         }
-    } else { /*
-          for (auto team : teams) {
-              auto players_in_team = listPlayersInTeam(team);
-
-              if (!players_in_team.empty()) {
-                  QStringList player_names;
-                  for (auto player : players_in_team) {
-                      player_names.push_back(player->getName());
-                  }
-                  QString fullName = QString("%1: %2").arg(team).arg(player_names.join(", "));
-                                  changes
-                  list_players.append(fullName);
-                  list_count.append(getCount(coop_boards[team]));
-                  list_done.append(checkSolution(coop_boards[team]));
-              }
-          }*/
+    } else {
+        for (auto team : teams) {
+            auto players_in_team = listPlayersInTeam(team);
+            if (!players_in_team.empty()) {
+                QStringList player_names;
+                for (auto player : players_in_team) {
+                    player_names.push_back(player->getName());
+                }
+                QString fullName = QString("%1: %2").arg(team).arg(player_names.join(", "));
+                bool done = active && checkSolution(coop_boards[team]);
+                int count = !active ? 0 : getCount(coop_boards[team]);
+                changes.push_back(StatusChange(done, count, fullName).toJson());
+            }
+        }
     }
 
     obj["message"] = STATUS_CHANGE;
@@ -325,6 +323,12 @@ void Game::dataReceived() {
                 break;
 
             case NEW_VALUE: {
+                if (mode == COOP) {
+                    QString team = player->getTeam();
+                    auto list_players = listPlayersInTeam(team, player);
+                    sendMessageToPlayers(obj, list_players);
+                }
+
                 std::map<size_t, int> values;
 
                 if (obj.find("values") == obj.end()) {
@@ -344,8 +348,6 @@ void Game::dataReceived() {
 
                     if (mode == COOP) {
                         QString team = player->getTeam();
-                        auto list_players = listPlayersInTeam(team, player);
-                        sendMessageToPlayers(obj, list_players);
                         coop_boards[team][pos] = val;
                         if (checkSolution(coop_boards[team])) {
                             gameOverWinner(team);

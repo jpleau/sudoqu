@@ -165,10 +165,9 @@ signals:
 
     /**
      * @brief emitted after receiving a new value from a new player (coop mode)
-     * @param int pos the position that is updated
-     * @param int value the new value
+     * @param map<int, int> list of updated values
      */
-    void otherPlayerValue(int, int);
+    void otherPlayerValues(std::map<int, int> &);
 
     /**
      * @brief emitted after receiving a new focus position for a player (coop mode)
