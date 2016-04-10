@@ -32,7 +32,7 @@ FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui
 
 
-VERSION = "0.0.1"
+VERSION = "0.0.3"
 
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
@@ -45,3 +45,6 @@ PKGCONFIG += qqwing
 
 RESOURCES += \
     resources.qrc
+
+docs.commands = rm -rf doc/ && (cat $$_PRO_FILE_PWD_/Doxyfile; echo "INPUT=$$_PRO_FILE_PWD_/src") | doxygen -
+QMAKE_EXTRA_TARGETS = docs
