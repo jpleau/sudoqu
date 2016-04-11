@@ -45,7 +45,7 @@ public:
     ~MainWindow();
 
 protected:
-    void keyReleaseEvent(QKeyEvent *) override;
+    void keyPressEvent(QKeyEvent *) override;
     void mousePressEvent(QMouseEvent *) override;
 
 private:

@@ -38,6 +38,7 @@ void GameFrame::newBoard(std::vector<int> &g, std::vector<int> &b, GameMode m) {
     gameOver = false;
     mode = m;
     repaint();
+    playersFocus.clear();
     emit setGameMode(mode);
 }
 
@@ -68,6 +69,10 @@ bool GameFrame::isGameActive() const {
 }
 
 void GameFrame::cheat() {
+    if (!active || gameOver) {
+        return;
+    }
+
     Sudoku s;
     s.setBoard(given);
     board = s.getSolution();
@@ -81,6 +86,7 @@ void GameFrame::cheat() {
 
     emit sendValues(board);
     repaint();
+    gameOver = true;
 }
 
 void GameFrame::clearBoard() {

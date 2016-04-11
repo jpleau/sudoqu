@@ -219,11 +219,10 @@ int Game::getCount(std::vector<int> &board) {
 }
 
 void Game::gameOverWinner(QString team) {
-    auto players = listPlayersInTeam(team);
     QJsonObject obj;
     obj["message"] = GAME_OVER_WINNER;
     obj["team"] = team;
-    sendMessageToPlayers(obj, players);
+    sendMessageToAllPlayers(obj);
 }
 
 void Game::gameOverWinner(Player *player) {

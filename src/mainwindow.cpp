@@ -68,7 +68,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::keyReleaseEvent(QKeyEvent *event) {
+void MainWindow::keyPressEvent(QKeyEvent *event) {
     if (konamiCount < konamiKeys.size()) {
         if (konamiKeys[konamiCount] == event->key()) {
             ++konamiCount;
