@@ -237,6 +237,8 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
     }
 
     if (key == Qt::Key_Right || key == Qt::Key_Left || key == Qt::Key_Down || key == Qt::Key_Up) {
+        int old_focus = focused;
+
         int row = focused / 9;
         int col = focused % 9;
 
@@ -256,6 +258,10 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
         }
 
         focused = row * 9 + col;
+
+        if (focused != old_focus) {
+            emit sendFocusedSquare(focused);
+        }
 
     } else {
         if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
