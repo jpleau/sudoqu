@@ -194,6 +194,13 @@ void Player::dataReceived() {
                     list.emplace_back(change.toObject());
                 }
 
+                std::sort(list.begin(), list.end(), [](auto &a, auto &b) {
+                    if (a.count == b.count) {
+                        return a.name > b.name;
+                    }
+                    return a.count > b.count;
+                });
+
                 emit receivedStatusChanges(list, obj["count_total"].toInt());
                 break;
             }
