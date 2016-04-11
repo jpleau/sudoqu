@@ -54,14 +54,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         Qt::Key_Up,   Qt::Key_Up,    Qt::Key_Down, Qt::Key_Down, Qt::Key_Left,   Qt::Key_Right,
         Qt::Key_Left, Qt::Key_Right, Qt::Key_B,    Qt::Key_A,    Qt::Key_Return,
     };
-
-    we_move_unseen.setMedia(QUrl("qrc:/konami.ogg"));
-
-    connect(&we_move_unseen, &QMediaPlayer::stateChanged, [=](auto state) {
-        if (state == QMediaPlayer::StoppedState) {
-            we_move_unseen.setMedia(QUrl("qrc:/konami.ogg"));
-        }
-    });
 }
 
 MainWindow::~MainWindow() {
@@ -77,7 +69,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         }
 
         if (konamiCount >= konamiKeys.size()) {
-            we_move_unseen.play();
+            // TODO: do something :)
             konamiCount = 0;
         }
     }

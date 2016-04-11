@@ -43,8 +43,5 @@ CONFIG(debug, debug|release){
 CONFIG += link_pkgconfig
 PKGCONFIG += qqwing
 
-RESOURCES += \
-    resources.qrc
-
 docs.commands = rm -rf doc/ && (cat $$_PRO_FILE_PWD_/Doxyfile; echo "INPUT=$$_PRO_FILE_PWD_/src") | doxygen -
 QMAKE_EXTRA_TARGETS = docs
