@@ -19,7 +19,7 @@
 #ifndef SUDOQU_CONSTANTS_H
 #define SUDOQU_CONSTANTS_H
 
-#define SUDOQU_VERSION 3
+#define SUDOQU_VERSION 5
 
 namespace Sudoqu {
 
