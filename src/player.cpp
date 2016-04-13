@@ -119,10 +119,9 @@ bool Player::isDone() const {
 }
 
 void Player::changeName(QString new_name) {
-    name = new_name.toHtmlEscaped();
+    this->name = new_name;
     QJsonObject obj;
     obj["message"] = CHANGE_NAME;
-    obj["old_name"] = this->name;
     obj["new_name"] = new_name.toHtmlEscaped();
     sendMessage(obj);
 }

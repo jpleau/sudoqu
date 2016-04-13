@@ -364,8 +364,9 @@ void Game::dataReceived() {
             }
 
             case CHANGE_NAME:
-                player->setName(obj["new_name"].toString());
                 obj["id"] = player->getId();
+                obj["old_name"] = player->getName();
+                player->setName(obj["new_name"].toString());
                 sendMessageToAllPlayers(obj);
                 sendStatusChanges();
                 break;
