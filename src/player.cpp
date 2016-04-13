@@ -41,6 +41,8 @@ void Player::connectToGame(QString host) {
     socket->connectToHost(host, 19770);
     connect(socket.get(), &QTcpSocket::connected, this, &Player::clientConnected);
     connect(socket.get(), &QTcpSocket::disconnected, this, &Player::clientDisconnected);
+    void (QAbstractSocket::*sig)(QAbstractSocket::SocketError) = &QAbstractSocket::error;
+    connect(socket.get(), sig, [=](QAbstractSocket::SocketError) { emit playerDisconnected(); });
 }
 
 void Player::disconnectFromServer() {
