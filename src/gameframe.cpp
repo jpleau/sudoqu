@@ -265,7 +265,7 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
 
         focused = row * 9 + col;
 
-        if (focused != old_focus) {
+        if (focused != old_focus && mode == COOP) {
             emit sendFocusedSquare(focused);
         }
 
