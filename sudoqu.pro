@@ -5,7 +5,6 @@ CONFIG += c++14
 TARGET = sudoqu
 TEMPLATE = app
 
-
 SOURCES +=  src/main.cpp\
             src/mainwindow.cpp \
             src/gameframe.cpp \
@@ -31,8 +30,7 @@ HEADERS  += src/mainwindow.h \
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui
 
-
-VERSION = "0.0.3"
+VERSION = "0.0.6"
 
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
