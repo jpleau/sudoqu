@@ -20,6 +20,7 @@
 #define SUDOQU_GAMEFRAME_H
 
 #include "constants.h"
+#include "colortheme.h"
 
 #include <QFrame>
 
@@ -46,6 +47,7 @@ public:
     void otherPlayerValues(std::map<int, int> &);
     void otherPlayerFocus(int, int);
     void gameOverWinner();
+    void setColorTheme(ColorTheme);
 
 signals:
     void sendFocusedSquare(int);
@@ -75,6 +77,8 @@ private:
     };
 
     int moveFocus(int, bool);
+
+    ColorTheme colors;
 };
 }
 

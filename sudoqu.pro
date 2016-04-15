@@ -14,7 +14,8 @@ SOURCES +=  src/main.cpp\
             src/network.cpp \
             src/connectdialog.cpp \
             src/chatbox.cpp \
-            src/settings.cpp
+            src/settings.cpp \
+            src/colortheme.cpp
 
 HEADERS  += src/mainwindow.h \
             src/gameframe.h \
@@ -25,7 +26,8 @@ HEADERS  += src/mainwindow.h \
             src/connectdialog.h \
             src/chatbox.h \
             src/settings.h \
-            src/constants.h
+            src/constants.h \
+            src/colortheme.h
 
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui

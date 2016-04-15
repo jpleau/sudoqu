@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         Qt::Key_Up,   Qt::Key_Up,    Qt::Key_Down, Qt::Key_Down, Qt::Key_Left,   Qt::Key_Right,
         Qt::Key_Left, Qt::Key_Right, Qt::Key_B,    Qt::Key_A,    Qt::Key_Return,
     };
+
+    ui->frame->setColorTheme(settings.getColorTheme());
 }
 
 MainWindow::~MainWindow() {

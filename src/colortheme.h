@@ -1,5 +1,5 @@
 /*
- * settings.h
+ * colortheme.h
  * Copyright (C) 2016  Jason Pleau <jason@jpleau.ca>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUDOQU_SETTINGS_H
-#define SUDOQU_SETTINGS_H
+#ifndef COLORTHEME_H
+#define COLORTHEME_H
 
-#include "colortheme.h"
-
-#include <QSettings>
+#include <QColor>
 
 namespace Sudoqu {
 
-class Settings : public QSettings {
-    Q_OBJECT
-public:
-    Settings(QObject * = nullptr);
+struct ColorTheme {
+    QColor focus_background;
+    QColor focus_foreground;
 
-    QString getHost() const;
-    void setHost(QString);
+    QColor other_focus_background;
+    QColor other_focus_foreground;
 
-    QString getName() const;
-    void setName(QString);
+    QColor given_background;
+    QColor given_foreground;
 
-    QStringList getTeamNames();
+    QColor filled_background;
+    QColor filled_foreground;
 
-    ColorTheme getColorTheme();
+    QColor background;
+    QColor foreground;
+
+    QColor lines;
 };
 }
 

@@ -118,6 +118,10 @@ void GameFrame::gameOverWinner() {
     repaint();
 }
 
+void GameFrame::setColorTheme(ColorTheme theme) {
+    this->colors = theme;
+}
+
 void GameFrame::paintEvent(QPaintEvent *) {
     if (!active) {
         return;
@@ -144,10 +148,14 @@ void GameFrame::paintEvent(QPaintEvent *) {
     QFont font("Ubuntu", fontSize);
     painter.setFont(font);
 
-    QPen pen(Qt::black);
-    painter.setRenderHint(QPainter::Antialiasing);
+    QPen given_fg(colors.given_foreground);
+    QPen filled_fg(colors.filled_foreground);
+    QPen focus_fg(colors.filled_foreground);
+    QPen other_focus_fg(colors.filled_foreground);
+    QPen fg(colors.foreground);
+    QPen lines_color(colors.lines);
 
-    painter.setPen(pen);
+    painter.setRenderHint(QPainter::Antialiasing);
 
     std::map<int, bool> otherFocus;
     if (!playersFocus.empty()) {
@@ -165,15 +173,29 @@ void GameFrame::paintEvent(QPaintEvent *) {
             int valueGiven = this->getGivenAt(pos);
             int value = this->getAt(pos);
 
+            QColor bg;
+
+            QPen fg_pen = fg;
+
             if (valueGiven > 0) {
-                painter.fillRect(rect, Qt::gray);
+                bg = colors.given_background;
+                fg_pen = given_fg;
+            } else if (value > 0) {
+                bg = colors.filled_background;
+                fg_pen = filled_fg;
+            } else if (pos == focused) {
+                bg = colors.focus_background;
+                fg_pen = focus_fg;
+            } else if (otherFocus[pos]) {
+                bg = colors.other_focus_background;
+                fg_pen = other_focus_fg;
+            } else {
+                bg = colors.background;
+                fg_pen = fg;
             }
 
-            if (pos == focused) {
-                painter.fillRect(rect, Qt::yellow);
-            } else if (otherFocus[pos]) {
-                painter.fillRect(rect, QColor(173, 239, 249));
-            }
+            painter.fillRect(rect, bg);
+            painter.setPen(fg_pen);
 
             if (value > 0) {
                 QString text = QString::number(value);
@@ -189,6 +211,7 @@ void GameFrame::paintEvent(QPaintEvent *) {
         }
     }
 
+    QPen pen(colors.lines);
     pen.setWidth(5);
     painter.setPen(pen);
     painter.drawLine(0, 0, rows * width, 0);
