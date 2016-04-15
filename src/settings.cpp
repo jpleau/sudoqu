@@ -20,7 +20,7 @@
 
 namespace Sudoqu {
 
-Sudoqu::Settings::Settings(QObject *parent) : QSettings("jpleau", "Sudoqu", parent) {
+Sudoqu::Settings::Settings(QObject *parent) : QSettings(QSettings::IniFormat, QSettings::UserScope, "jpleau", "Sudoqu", parent) {
 }
 
 QString Settings::getHost() const {
