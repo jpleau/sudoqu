@@ -64,6 +64,7 @@ private:
     void clearChat();
     void setupServer();
     void badVersion(int, int);
+    void configureColors();
 
     // Konami code
     int konamiCount = 0;
@@ -79,6 +80,7 @@ private:
     std::unique_ptr<QActionGroup> aboutGroup;
     std::unique_ptr<QAction> aboutAction;
     std::unique_ptr<QAction> aboutQtAction;
+    std::unique_ptr<QAction> colorsAction;
 };
 }
 

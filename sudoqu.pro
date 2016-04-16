@@ -15,7 +15,8 @@ SOURCES +=  src/main.cpp\
             src/connectdialog.cpp \
             src/chatbox.cpp \
             src/settings.cpp \
-            src/colortheme.cpp
+            src/colortheme.cpp \
+    src/colorthemedialog.cpp
 
 HEADERS  += src/mainwindow.h \
             src/gameframe.h \
@@ -27,10 +28,12 @@ HEADERS  += src/mainwindow.h \
             src/chatbox.h \
             src/settings.h \
             src/constants.h \
-            src/colortheme.h
+            src/colortheme.h \
+    src/colorthemedialog.h
 
 FORMS    += ui/mainwindow.ui \
-            ui/connectdialog.ui
+            ui/connectdialog.ui \
+    ui/colorthemedialog.ui
 
 VERSION = "0.0.6"
 

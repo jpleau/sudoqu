@@ -180,12 +180,12 @@ void GameFrame::paintEvent(QPaintEvent *) {
             if (valueGiven > 0) {
                 bg = colors.given_background;
                 fg_pen = given_fg;
-            } else if (value > 0) {
-                bg = colors.filled_background;
-                fg_pen = filled_fg;
             } else if (pos == focused) {
                 bg = colors.focus_background;
                 fg_pen = focus_fg;
+            } else if (value > 0) {
+                bg = colors.filled_background;
+                fg_pen = filled_fg;
             } else if (otherFocus[pos]) {
                 bg = colors.other_focus_background;
                 fg_pen = other_focus_fg;

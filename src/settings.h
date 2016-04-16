@@ -39,6 +39,7 @@ public:
     QStringList getTeamNames();
 
     ColorTheme getColorTheme();
+    void setColorTheme(ColorTheme);
 };
 }
 

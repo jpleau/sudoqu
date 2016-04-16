@@ -19,28 +19,45 @@
 #ifndef COLORTHEME_H
 #define COLORTHEME_H
 
-#include <QColor>
+#include <QMetaType>
+#include <QString>
 
 namespace Sudoqu {
 
 struct ColorTheme {
-    QColor focus_background;
-    QColor focus_foreground;
+    enum Theme : int {
+        CUSTOM = 1,
+        MOLOKAI,
+    };
 
-    QColor other_focus_background;
-    QColor other_focus_foreground;
+    Theme name;
 
-    QColor given_background;
-    QColor given_foreground;
+    QString focus_background;
+    QString focus_foreground;
 
-    QColor filled_background;
-    QColor filled_foreground;
+    QString other_focus_background;
+    QString other_focus_foreground;
 
-    QColor background;
-    QColor foreground;
+    QString given_background;
+    QString given_foreground;
 
-    QColor lines;
+    QString filled_background;
+    QString filled_foreground;
+
+    QString background;
+    QString foreground;
+
+    QString lines;
+
+    ColorTheme();
+    ColorTheme(Theme);
 };
+
+QDataStream &operator<<(QDataStream &, const ColorTheme &);
+
+QDataStream &operator>>(QDataStream &, ColorTheme &);
 }
+
+Q_DECLARE_METATYPE(Sudoqu::ColorTheme);
 
 #endif

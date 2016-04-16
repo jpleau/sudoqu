@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 
 #include "connectdialog.h"
+#include "colorthemedialog.h"
 #include "game.h"
 #include "player.h"
 
@@ -132,6 +133,12 @@ void MainWindow::setupMenu() {
 
     ui->menuGame->addSeparator();
 
+    colorsAction = std::make_unique<QAction>("Configure colors", this);
+
+    ui->menuGame->addAction(colorsAction.get());
+
+    ui->menuGame->addSeparator();
+
     quitAction = std::make_unique<QAction>("Quit", this);
     quitAction->setShortcut(Qt::ALT | Qt::Key_F4);
     ui->menuGame->addAction(quitAction.get());
@@ -156,17 +163,17 @@ void MainWindow::setupMenu() {
         aboutTitle = aboutTitle.arg(QCoreApplication::applicationVersion());
 
         QString aboutMsg("<p>Copyright 2016 Jason Pleau <a href=\"mailto:jason@jpleau.ca\">jason@jpleau.ca</a></p>"
-                         "<p>This program is free software: you can redistribute it and/or modify"
-                         "it under the terms of the GNU General Public License as published by"
-                         "the Free Software Foundation, either version 3 of the License, or"
+                         "<p>This program is free software: you can redistribute it and/or modify "
+                         "it under the terms of the GNU General Public License as published by "
+                         "the Free Software Foundation, either version 3 of the License, or "
                          "(at your option) any later version.</p>"
 
-                         "<p>This program is distributed in the hope that it will be useful,"
-                         "but WITHOUT ANY WARRANTY; without even the implied warranty of"
-                         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
+                         "<p>This program is distributed in the hope that it will be useful, "
+                         "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+                         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the "
                          "GNU General Public License for more details.</p>"
 
-                         "<p>You should have received a copy of the GNU General Public License"
+                         "<p>You should have received a copy of the GNU General Public License "
                          "along with this program.  If not, see <a "
                          "href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p>");
         QMessageBox msgBox(this);
@@ -175,6 +182,8 @@ void MainWindow::setupMenu() {
         msgBox.exec();
     });
     connect(aboutQtAction.get(), &QAction::triggered, QApplication::aboutQt);
+
+    connect(colorsAction.get(), &QAction::triggered, this, &MainWindow::configureColors);
 }
 
 void MainWindow::startServer(bool acceptConnections) {
@@ -382,5 +391,17 @@ void MainWindow::setupServer() {
 
 void MainWindow::badVersion(int server_version, int client_version) {
     ui->status->showMessage(QString("Bad version. Server: %1 -- Client: %2").arg(server_version).arg(client_version));
+}
+
+void MainWindow::configureColors() {
+    ColorThemeDialog dialog(settings.getColorTheme());
+    if (dialog.exec() == QDialog::Accepted) {
+        qDebug() << "AA";
+        ColorTheme theme = dialog.getColorTheme();
+
+        settings.setColorTheme(theme);
+        ui->frame->setColorTheme(theme);
+        ui->frame->repaint();
+    }
 }
 }
