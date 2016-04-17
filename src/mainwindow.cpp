@@ -396,7 +396,6 @@ void MainWindow::badVersion(int server_version, int client_version) {
 void MainWindow::configureColors() {
     ColorThemeDialog dialog(settings.getColorTheme());
     if (dialog.exec() == QDialog::Accepted) {
-        qDebug() << "AA";
         ColorTheme theme = dialog.getColorTheme();
 
         settings.setColorTheme(theme);

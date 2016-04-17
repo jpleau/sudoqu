@@ -59,7 +59,7 @@ public:
     ~ColorThemeDialog();
 
 private:
-    std::map<QString, std::tuple<QString *, std::unique_ptr<QLabel>, std::unique_ptr<ColorWidget>>> widgets;
+    std::vector<std::unique_ptr<QWidget>> widgets;
 
     void reloadColors();
 

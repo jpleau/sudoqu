@@ -62,16 +62,10 @@ QStringList Settings::getTeamNames() {
 }
 
 void Settings::setColorTheme(ColorTheme theme) {
-    setValue("colorTheme", theme.name);
     setValue("colors", QVariant::fromValue(theme));
 }
 
 ColorTheme Settings::getColorTheme() {
-    ColorTheme::Theme name = static_cast<ColorTheme::Theme>(value("colorTheme", ColorTheme::CUSTOM).toInt());
-    if (name == ColorTheme::CUSTOM) {
-        return value("colors").value<ColorTheme>();
-    } else {
-        return ColorTheme(name);
-    }
+    return value("colors", QVariant::fromValue(ColorTheme())).value<ColorTheme>();
 }
 }

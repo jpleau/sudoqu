@@ -147,14 +147,6 @@ void GameFrame::paintEvent(QPaintEvent *) {
 
     QFont font("Ubuntu", fontSize);
     painter.setFont(font);
-
-    QPen given_fg(colors.given_foreground);
-    QPen filled_fg(colors.filled_foreground);
-    QPen focus_fg(colors.filled_foreground);
-    QPen other_focus_fg(colors.filled_foreground);
-    QPen fg(colors.foreground);
-    QPen lines_color(colors.lines);
-
     painter.setRenderHint(QPainter::Antialiasing);
 
     std::map<int, bool> otherFocus;
@@ -166,6 +158,8 @@ void GameFrame::paintEvent(QPaintEvent *) {
         }
     }
 
+    QPen pen;
+
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
             int pos = row * rows + col;
@@ -174,28 +168,28 @@ void GameFrame::paintEvent(QPaintEvent *) {
             int value = this->getAt(pos);
 
             QColor bg;
-
-            QPen fg_pen = fg;
+            QColor fg;
 
             if (valueGiven > 0) {
                 bg = colors.given_background;
-                fg_pen = given_fg;
+                fg = colors.given_foreground;
             } else if (pos == focused) {
                 bg = colors.focus_background;
-                fg_pen = focus_fg;
+                fg = colors.focus_foreground;
             } else if (value > 0) {
                 bg = colors.filled_background;
-                fg_pen = filled_fg;
+                fg = colors.filled_foreground;
             } else if (otherFocus[pos]) {
                 bg = colors.other_focus_background;
-                fg_pen = other_focus_fg;
+                fg = colors.other_focus_foreground;
             } else {
                 bg = colors.background;
-                fg_pen = fg;
+                fg = colors.foreground;
             }
 
+            pen.setColor(fg);
             painter.fillRect(rect, bg);
-            painter.setPen(fg_pen);
+            painter.setPen(pen);
 
             if (value > 0) {
                 QString text = QString::number(value);
@@ -204,24 +198,29 @@ void GameFrame::paintEvent(QPaintEvent *) {
         }
     }
 
-    for (int x = 0; x < rows; ++x) {
-        for (int y = 0; y < cols; ++y) {
-            painter.drawLine(x * width, y * height, x * width + width, y * height);
-            painter.drawLine(x * width, y * height, x * width, y * height + height);
+    QPen outer_lines;
+    outer_lines.setColor(colors.outer_lines);
+    outer_lines.setWidth(5);
+
+    QPen inner_lines;
+    inner_lines.setColor(colors.inner_lines);
+    inner_lines.setWidth(1);
+
+    for (int i = 0; i <= rows; ++i) {
+        painter.setPen(inner_lines);
+        if (i % 3 == 0) {
+            painter.setPen(outer_lines);
         }
+        painter.drawLine(width * i, 0, width * i, height * rows);
     }
 
-    QPen pen(colors.lines);
-    pen.setWidth(5);
-    painter.setPen(pen);
-    painter.drawLine(0, 0, rows * width, 0);
-    painter.drawLine(0, 0, 0, cols * height);
-    painter.drawLine(0, rows * height, cols * width, rows * height);
-    painter.drawLine(cols * width, 0, cols * width, rows * height);
-    painter.drawLine(0, height * 3, rows * width, height * 3);
-    painter.drawLine(0, height * 6, rows * width, height * 6);
-    painter.drawLine(width * 3, 0, width * 3, cols * height);
-    painter.drawLine(width * 6, 0, width * 6, cols * height);
+    for (int i = 0; i <= cols; ++i) {
+        painter.setPen(inner_lines);
+        if (i % 3 == 0) {
+            painter.setPen(outer_lines);
+        }
+        painter.drawLine(0, height * i, width * cols, height * i);
+    }
 }
 
 void GameFrame::mouseReleaseEvent(QMouseEvent *event) {

@@ -25,7 +25,8 @@ namespace Sudoqu {
 QDataStream &operator<<(QDataStream &out, const ColorTheme &theme) {
     out << theme.background;
     out << theme.foreground;
-    out << theme.lines;
+    out << theme.outer_lines;
+    out << theme.inner_lines;
     out << theme.focus_background;
     out << theme.focus_foreground;
     out << theme.other_focus_background;
@@ -41,7 +42,8 @@ QDataStream &operator<<(QDataStream &out, const ColorTheme &theme) {
 QDataStream &operator>>(QDataStream &in, ColorTheme &theme) {
     in >> theme.background;
     in >> theme.foreground;
-    in >> theme.lines;
+    in >> theme.outer_lines;
+    in >> theme.inner_lines;
     in >> theme.focus_background;
     in >> theme.focus_foreground;
     in >> theme.other_focus_background;
@@ -53,41 +55,63 @@ QDataStream &operator>>(QDataStream &in, ColorTheme &theme) {
     return in;
 }
 
-ColorTheme::ColorTheme() : ColorTheme(CUSTOM) {
+ColorTheme::ColorTheme() : ColorTheme(DEFAULT) {
 }
 
+std::map<ColorTheme::Theme, std::map<QString, QString>> ColorTheme::themes = {
+    {DEFAULT,
+     {
+         {"background", "#ffffff"},
+         {"foreground", "#000000"},
+         {"outer_lines", "#000000"},
+         {"inner_lines", "#000000"},
+         {"focus_background", "#ffff00"},
+         {"focus_foreground", "#000000"},
+         {"given_background", "#808080"},
+         {"given_foreground", "#000000"},
+         {"filled_background", "#ffffff"},
+         {"filled_foreground", "#000000"},
+         {"other_focus_background", "#adeff9"},
+         {"other_focus_foreground", "#000000"},
+     }
+
+    },
+
+    {MOLOKAI,
+     {
+         {"background", "#808080"},
+         {"foreground", "#F8F8F2"},
+         {"outer_lines", "#455354"},
+         {"inner_lines", "#455354"},
+         {"focus_background", "#ffff00"},
+         {"focus_foreground", "#000000"},
+         {"given_background", "#272822"},
+         {"given_foreground", "#000000"},
+         {"filled_background", "#ffffff"},
+         {"filled_foreground", "#000000"},
+         {"other_focus_background", "#66D9EF"},
+         {"other_focus_foreground", "#f8f8f2"},
+
+     }}
+
+};
+
 ColorTheme::ColorTheme(Theme theme) {
-
-    switch (theme) {
-    case CUSTOM:
-        name = CUSTOM;
-        background = "#ffffff";
-        foreground = "#000000";
-        lines = "#000000";
-        focus_background = "#ffff00";
-        focus_foreground = "#000000";
-        given_background = "#808080";
-        given_foreground = "#000000";
-        filled_background = "#ffffff";
-        filled_foreground = "#000000";
-        other_focus_background = "#adeff9";
-        other_focus_foreground = "#000000";
-        break;
-
-    case MOLOKAI:
-        name = MOLOKAI;
-        background = "#808080";
-        foreground = "#F8F8F2";
-        lines = "#455354";
-        focus_background = "#ffff00";
-        focus_foreground = "#000000";
-        given_background = "#272822";
-        given_foreground = "#000000";
-        filled_background = "#ffffff";
-        filled_foreground = "#000000";
-        other_focus_background = "#66D9EF";
-        other_focus_foreground = "#f8f8f2";
-        break;
+    if (themes.find(theme) == themes.end()) {
+        theme = DEFAULT;
     }
+
+    background = themes[theme]["background"];
+    foreground = themes[theme]["foreground"];
+    outer_lines = themes[theme]["outer_lines"];
+    inner_lines = themes[theme]["inner_lines"];
+    focus_background = themes[theme]["focus_background"];
+    focus_foreground = themes[theme]["focus_foreground"];
+    given_background = themes[theme]["given_background"];
+    given_foreground = themes[theme]["given_foreground"];
+    filled_background = themes[theme]["filled_background"];
+    filled_foreground = themes[theme]["filled_foreground"];
+    other_focus_background = themes[theme]["other_focus_background"];
+    other_focus_foreground = themes[theme]["other_focus_foreground"];
 }
 }

@@ -22,13 +22,20 @@
 #include <QMetaType>
 #include <QString>
 
+#include <map>
+#include <vector>
+
 namespace Sudoqu {
 
 struct ColorTheme {
+
     enum Theme : int {
-        CUSTOM = 1,
+        NONE = 1,
+        DEFAULT,
         MOLOKAI,
     };
+
+    static std::map<Theme, std::map<QString, QString>> themes;
 
     Theme name;
 
@@ -47,7 +54,8 @@ struct ColorTheme {
     QString background;
     QString foreground;
 
-    QString lines;
+    QString outer_lines;
+    QString inner_lines;
 
     ColorTheme();
     ColorTheme(Theme);

@@ -36,9 +36,12 @@ ColorThemeDialog::ColorThemeDialog(ColorTheme current_theme, QWidget *parent)
         reloadColors();
     });
 
-    ui->select_theme->addItem("Custom", ColorTheme::CUSTOM);
+    ui->select_theme->blockSignals(true);
+    ui->select_theme->addItem("", ColorTheme::NONE);
+    ui->select_theme->addItem("Default", ColorTheme::DEFAULT);
     ui->select_theme->addItem("Molokai", ColorTheme::MOLOKAI);
-    ui->select_theme->setCurrentIndex(ui->select_theme->findData(theme.name));
+    ui->select_theme->blockSignals(false);
+    reloadColors();
 }
 
 ColorTheme ColorThemeDialog::getColorTheme() const {
@@ -50,37 +53,37 @@ ColorThemeDialog::~ColorThemeDialog() {
 }
 
 void ColorThemeDialog::reloadColors() {
-
     widgets.clear();
 
-    std::map<QString, QString *> widgets_names = {
-        {"Background", &theme.background},
-        {"Foreground", &theme.foreground},
-        {"Givens background", &theme.given_background},
-        {"Givens foreground", &theme.given_foreground},
-        {"Focus Background", &theme.focus_background},
-        {"Focus foreground", &theme.focus_foreground},
-        {"Coop focus background", &theme.other_focus_background},
-        {"Coop focus foreground", &theme.other_focus_foreground},
-        {"Filled background", &theme.filled_background},
-        {"Filled foreground", &theme.filled_foreground},
-        {"Lines", &theme.lines},
+    std::vector<std::map<QString, QString *>> widgets_names = {
+        {{"Background", &theme.background}, {"Foreground", &theme.foreground}},
+        {{"Givens background", &theme.given_background}, {"Givens foreground", &theme.given_foreground}},
+        {{"Focus Background", &theme.focus_background}, {"Focus foreground", &theme.focus_foreground}},
+        {{"Coop focus background", &theme.other_focus_background},
+         {"Coop focus foreground", &theme.other_focus_foreground}},
+        {{"Filled background", &theme.filled_background}, {"Filled foreground", &theme.filled_foreground}},
+        {{"Outer lines", &theme.outer_lines}, {"Inner lines", &theme.inner_lines}},
     };
-
-    for (auto &w : widgets_names) {
-        QLabel *label = new QLabel(w.first);
-        ColorWidget *widget = new ColorWidget();
-        widget->setReadOnly(true);
-        widget->setStyleSheet("background-color: " + *w.second);
-        ui->form->addRow(label, widget);
-
-        connect(widget, &ColorWidget::focused, [=]() {
-            *w.second = QColorDialog::getColor(*w.second).name();
+    QFormLayout *form = ui->form;
+    for (auto &list : widgets_names) {
+        for (auto &w : list) {
+            QLabel *label = new QLabel(w.first, this);
+            ColorWidget *widget = new ColorWidget(this);
+            widget->setReadOnly(true);
             widget->setStyleSheet("background-color: " + *w.second);
-        });
-
-        widgets[w.first] =
-            std::make_tuple(w.second, std::unique_ptr<QLabel>(label), std::unique_ptr<ColorWidget>(widget));
+            form->addRow(label, widget);
+            connect(widget, &ColorWidget::focused, [=]() {
+                *w.second = QColorDialog::getColor(*w.second).name();
+                widget->setStyleSheet("background-color: " + *w.second);
+            });
+            widgets.push_back(std::unique_ptr<QWidget>(label));
+            widgets.push_back(std::unique_ptr<QWidget>(widget));
+        }
+        QFrame *line = new QFrame(this);
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+        form->addRow(line);
+        widgets.push_back(std::unique_ptr<QWidget>(line));
     }
 }
 
