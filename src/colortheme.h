@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COLORTHEME_H
-#define COLORTHEME_H
+#ifndef SUDOQU_COLORTHEME_H
+#define SUDOQU_COLORTHEME_H
 
 #include <QMetaType>
 #include <QString>

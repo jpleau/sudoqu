@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COLORTHEMEDIALOG_H
-#define COLORTHEMEDIALOG_H
+#ifndef SUDOQU_COLORTHEMEDIALOG_H
+#define SUDOQU_COLORTHEMEDIALOG_H
 
 #include "colortheme.h"
 
