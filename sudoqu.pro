@@ -16,7 +16,7 @@ SOURCES +=  src/main.cpp\
             src/chatbox.cpp \
             src/settings.cpp \
             src/colortheme.cpp \
-    src/colorthemedialog.cpp
+            src/colorthemedialog.cpp
 
 HEADERS  += src/mainwindow.h \
             src/gameframe.h \
@@ -29,13 +29,13 @@ HEADERS  += src/mainwindow.h \
             src/settings.h \
             src/constants.h \
             src/colortheme.h \
-    src/colorthemedialog.h
+            src/colorthemedialog.h
 
 FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui \
-    ui/colorthemedialog.ui
+            ui/colorthemedialog.ui
 
-VERSION = "0.0.6"
+VERSION = "0.1.0"
 
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
