@@ -20,10 +20,13 @@
 
 #include "sudoku.h"
 
+#include <QGuiApplication>
 #include <QDebug>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QKeyEvent>
+
+#include <algorithm>
 
 namespace Sudoqu {
 
@@ -37,9 +40,10 @@ void GameFrame::newBoard(std::vector<int> &g, std::vector<int> &b, GameMode m) {
     active = true;
     gameOver = false;
     mode = m;
-    repaint();
+    notes.clear();
     playersFocus.clear();
     emit setGameMode(mode);
+    repaint();
 }
 
 int GameFrame::getAt(int pos) const {
@@ -51,6 +55,7 @@ void GameFrame::setAt(int pos, int val, bool send_network) {
     if (send_network) {
         emit sendValue(pos, val);
     }
+    notes[pos].clear();
 }
 
 int GameFrame::getGivenAt(int pos) const {
@@ -122,6 +127,16 @@ void GameFrame::setColorTheme(ColorTheme theme) {
     this->colors = theme;
 }
 
+void GameFrame::receivedNotes(int pos, std::vector<int> &notes) {
+    this->notes[pos] = notes;
+    repaint();
+}
+
+void GameFrame::clearNotes() {
+    notes.clear();
+    repaint();
+}
+
 void GameFrame::paintEvent(QPaintEvent *) {
     if (!active) {
         return;
@@ -145,9 +160,14 @@ void GameFrame::paintEvent(QPaintEvent *) {
         fontSize = 12;
     }
 
+    int noteFontSize = 10;
+
     QFont font("Ubuntu", fontSize);
     painter.setFont(font);
     painter.setRenderHint(QPainter::Antialiasing);
+
+    QFont fontNotes = font;
+    fontNotes.setPixelSize(noteFontSize);
 
     std::map<int, bool> otherFocus;
     if (!playersFocus.empty()) {
@@ -191,7 +211,26 @@ void GameFrame::paintEvent(QPaintEvent *) {
             painter.fillRect(rect, bg);
             painter.setPen(pen);
 
-            if (value > 0) {
+            std::vector<int> &notes_pos = notes[pos];
+            if (!notes_pos.empty()) {
+                painter.setFont(fontNotes);
+                for (auto note : notes_pos) {
+                    QString text = QString::number(note);
+                    note--;
+                    int note_width = width / 3;
+                    int note_height = height / 3;
+                    int note_pos_x = note % 3;
+                    int note_pos_y = note / 3;
+
+                    int note_x = rect.x() + (note_pos_x * note_width);
+                    int note_y = rect.y() + (note_pos_y * note_height);
+
+                    QRect rect_note(note_x, note_y, note_width, note_height);
+                    painter.drawText(rect_note, Qt::AlignVCenter | Qt::AlignCenter, text);
+                }
+
+            } else if (value > 0) {
+                painter.setFont(font);
                 QString text = QString::number(value);
                 painter.drawText(rect, Qt::AlignVCenter | Qt::AlignCenter, text);
             }
@@ -260,6 +299,11 @@ void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
 void GameFrame::keyPressEvent(QKeyEvent *event) {
     int key = event->key();
 
+    if (key == Qt::Key_Control) {
+        takingNotes = !takingNotes;
+        return;
+    }
+
     if (focused == -1 || gameOver) {
         return;
     }
@@ -293,13 +337,38 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
 
     } else {
         if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
-            setAt(focused, 0, true);
+            if (!takingNotes) {
+                setAt(focused, 0, true);
+            } else {
+                notes[focused].clear();
+                if (mode == COOP) {
+                    emit sendNotes(focused, notes[focused]);
+                }
+            }
         } else if (key == Qt::Key_Escape) {
             focused = -1;
         } else {
             auto check = key_map.find(key);
             if (check != key_map.end()) {
-                setAt(focused, check->second, true);
+                if (!takingNotes) {
+                    setAt(focused, check->second, true);
+                } else {
+                    if (getAt(focused) > 0) {
+                        return;
+                    }
+                    std::vector<int> &notes_pos = notes[focused];
+
+                    auto iterator = std::find(notes_pos.begin(), notes_pos.end(), check->second);
+                    if (iterator == notes_pos.end()) {
+                        notes_pos.push_back(check->second);
+                        std::sort(notes_pos.begin(), notes_pos.end());
+                    } else {
+                        notes_pos.erase(iterator);
+                    }
+                    if (mode == COOP) {
+                        emit sendNotes(focused, notes_pos);
+                    }
+                }
             }
         }
     }

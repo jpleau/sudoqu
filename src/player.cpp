@@ -142,6 +142,16 @@ void Player::sendFocusedSquare(int pos) {
     sendMessage(obj);
 }
 
+void Player::sendNotes(int pos, std::vector<int> &notes) {
+    QJsonObject obj;
+    obj["message"] = UPDATE_NOTES;
+    obj["pos"] = pos;
+    std::list<QVariant> list(notes.begin(), notes.end());
+    QJsonArray array = QJsonArray::fromVariantList(QVariantList::fromStdList(list));
+    obj["notes"] = array;
+    sendMessage(obj);
+}
+
 QString Player::getTeam() const {
     return team;
 }
@@ -235,6 +245,19 @@ void Player::dataReceived() {
 
                 emit receivedNewBoard(given, board, mode);
 
+                if (mode == COOP) {
+                    emit clearNotes();
+                    QJsonObject notes_obj = obj["notes"].toObject();
+                    for (auto it = notes_obj.begin(); it != notes_obj.end(); ++it) {
+                        std::vector<int> notes;
+                        int pos = it.key().toInt();
+                        for (auto note : it.value().toArray()) {
+                            notes.push_back(note.toInt());
+                        }
+                        emit receivedNotes(pos, notes);
+                    }
+                }
+
                 break;
             }
 
@@ -280,6 +303,15 @@ void Player::dataReceived() {
 
                 emit gameOverWinner(winner);
 
+                break;
+            }
+            case UPDATE_NOTES: {
+                int pos = obj["pos"].toInt();
+                std::vector<int> notes;
+                for (auto i : obj["notes"].toArray()) {
+                    notes.push_back(i.toInt());
+                }
+                emit receivedNotes(pos, notes);
                 break;
             }
             }

@@ -110,6 +110,13 @@ public:
      */
     void sendFocusedSquare(int);
 
+    /**
+     * @brief send the player's notes to the server for a position
+     * @param int pos the position
+     * @param notes std::vector<int> the notes for that position
+     */
+    void sendNotes(int, std::vector<int> &);
+
 signals:
     /**
      * @brief emitted after a new player has connected
@@ -201,6 +208,18 @@ signals:
      * @param QString winner the winner (team or player)
      */
     void gameOverWinner(QString);
+
+    /**
+     * @brief received notes for a position
+     * @param int pos the position
+     * @param std::vector<int> the notes for that position
+     */
+    void receivedNotes(int, std::vector<int> &);
+
+    /**
+     * @brief clear the player's notes
+     */
+    void clearNotes();
 
 private:
     bool done = false;

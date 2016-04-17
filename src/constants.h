@@ -38,6 +38,7 @@ enum Messages : int {
     SEND_NAME,
     SERVER_DOWN,
     SET_FOCUS,
+    UPDATE_NOTES,
     YOUR_ID,
 };
 

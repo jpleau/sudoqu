@@ -350,6 +350,10 @@ void MainWindow::connectToServer(QString host) {
         QString msg = QString("<strong>%1</strong> has won the game !<br/>").arg(winner);
         ui->chat_area->appendHtml(msg);
     });
+
+    connect(ui->frame, &GameFrame::sendNotes, me.get(), &Player::sendNotes);
+    connect(me.get(), &Player::receivedNotes, ui->frame, &GameFrame::receivedNotes);
+    connect(me.get(), &Player::clearNotes, ui->frame, &GameFrame::clearNotes);
 }
 
 void MainWindow::changeName() {

@@ -48,12 +48,15 @@ public:
     void otherPlayerFocus(int, int);
     void gameOverWinner();
     void setColorTheme(ColorTheme);
+    void receivedNotes(int, std::vector<int> &);
+    void clearNotes();
 
 signals:
     void sendFocusedSquare(int);
     void setGameMode(GameMode);
     void sendValue(int = -1, int = -1);
     void sendValues(std::vector<int> &);
+    void sendNotes(int, std::vector<int> &);
 
 protected:
     void paintEvent(QPaintEvent *) override;
@@ -65,6 +68,7 @@ private:
     bool gameOver;
     std::vector<int> board;
     std::vector<int> given;
+    std::map<int, std::vector<int>> notes;
 
     GameMode mode;
     int focused = -1;
@@ -79,6 +83,8 @@ private:
     int moveFocus(int, bool);
 
     ColorTheme colors;
+
+    bool takingNotes = false;
 };
 }
 

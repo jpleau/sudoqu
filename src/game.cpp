@@ -191,6 +191,14 @@ QJsonObject Game::sendBoard(QString team) {
         std::list<QVariant> list_coop(coop_boards[team].begin(), coop_boards[team].end());
         QJsonArray coop_json = QJsonArray::fromVariantList(QList<QVariant>::fromStdList(list_coop));
         obj["board"] = coop_json;
+
+        QJsonObject obj_notes;
+        for (auto &note_list : notes[team]) {
+            std::list<QVariant> list_notes(note_list.second.begin(), note_list.second.end());
+            obj_notes[QString::number(note_list.first)] =
+                QJsonArray::fromVariantList(QVariantList::fromStdList(list_notes));
+        }
+        obj["notes"] = obj_notes;
     }
     return obj;
 }
@@ -401,6 +409,21 @@ void Game::dataReceived() {
                     }
 
                     sendStatusChanges();
+                }
+                break;
+            }
+
+            case UPDATE_NOTES: {
+                int position = obj["pos"].toInt();
+                std::vector<int> &team_notes = notes[player->getTeam()][position];
+                team_notes.clear();
+                auto list = obj["notes"].toArray();
+                for (auto i : list) {
+                    team_notes.push_back(i.toInt());
+                }
+                if (mode == COOP) {
+                    auto players = listPlayersInTeam(player->getTeam(), player);
+                    sendMessageToPlayers(obj, players);
                 }
                 break;
             }

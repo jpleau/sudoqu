@@ -101,9 +101,14 @@ private:
     std::map<QString, std::vector<int>> coop_boards;
 
     /**
- * @brief boards for the currently playing teams, used in versus
- */
+         * @brief boards for a player, used in versus
+         */
     std::map<Player *, std::vector<int>> player_boards;
+
+    /**
+     * @brief notes for a team, used in coop
+     */
+    std::map<QString, std::map<int, std::vector<int>>> notes;
 
     /**
      * @brief Sends a JSON encoded message to a player
