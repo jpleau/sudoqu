@@ -187,6 +187,13 @@ private:
      */
     void gameOverWinner(Player *);
 
+    /**
+     * @brief generate a player's name, adding a number to it if someone already has the same name
+     * @param id the player's id
+     * @param name the name the player has chosen
+     */
+    QString generatePlayerName(int, QString);
+
 private slots:
     /**
      * @brief called when a new client (socket) connected to the server

@@ -168,7 +168,7 @@ signals:
      * @param QString old_name player's old name
      * @param QString new_name player's new name
      */
-    void otherPlayerChangedName(int, QString, QString);
+    void otherPlayerChangedName(QString, QString);
 
     /**
      * @brief emitted after receiving a new value from a new player (coop mode)

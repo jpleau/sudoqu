@@ -119,7 +119,6 @@ bool Player::isDone() const {
 }
 
 void Player::changeName(QString new_name) {
-    this->name = new_name;
     QJsonObject obj;
     obj["message"] = CHANGE_NAME;
     obj["new_name"] = new_name.toHtmlEscaped();
@@ -262,7 +261,10 @@ void Player::dataReceived() {
             }
 
             case CHANGE_NAME:
-                emit otherPlayerChangedName(obj["id"].toInt(), obj["old_name"].toString(), obj["new_name"].toString());
+                if (obj["id"].toInt() == id) {
+                    name = obj["new_name"].toString();
+                }
+                emit otherPlayerChangedName(obj["old_name"].toString(), obj["new_name"].toString());
                 break;
 
             case NEW_VALUE: {

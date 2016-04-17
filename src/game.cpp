@@ -240,6 +240,32 @@ void Game::gameOverWinner(Player *player) {
     sendMessageToAllPlayers(obj);
 }
 
+QString Game::generatePlayerName(int id, QString name) {
+    bool nameChosen = false;
+    int inc = 0;
+    std::vector<Player *> list_players = listPlayers();
+    while (!nameChosen) {
+        QString tmp_name = name;
+        if (inc > 0) {
+            tmp_name = QString("(%1) %2").arg(inc).arg(tmp_name);
+        }
+        bool taken = false;
+        for (auto player : list_players) {
+            if (player->getId() != id && player->getName() == tmp_name) {
+                taken = true;
+            }
+        }
+
+        if (taken) {
+            ++inc;
+        } else {
+            nameChosen = true;
+            name = tmp_name;
+        }
+    }
+    return name;
+}
+
 std::vector<Player *> Game::listPlayersInTeam(QString team, Player *except) {
     std::vector<Player *> ret;
     for (auto p : players) {
@@ -298,7 +324,7 @@ void Game::dataReceived() {
             int message = obj["message"].toInt();
 
             switch (message) {
-            case SEND_NAME:
+            case SEND_NAME: {
                 if (obj.find("version") == obj.end() || obj["version"].toInt() != SUDOQU_VERSION) {
                     QJsonObject bad;
                     bad["message"] = BAD_VERSION;
@@ -308,7 +334,9 @@ void Game::dataReceived() {
                     return;
                 }
                 if (id == player->getId()) {
-                    player->setName(obj["name"].toString());
+                    QString name = generatePlayerName(id, obj["name"].toString());
+                    player->setName(name);
+                    obj["name"] = name;
                     obj["message"] = NEW_PLAYER;
                     sendMessageToAllPlayers(obj);
                 }
@@ -320,6 +348,7 @@ void Game::dataReceived() {
 
                 sendStatusChanges();
                 break;
+            }
             case CHAT_MESSAGE:
                 obj["name"] = player->getName();
                 sendMessageToAllPlayers(obj, player);
@@ -374,6 +403,7 @@ void Game::dataReceived() {
             case CHANGE_NAME:
                 obj["id"] = player->getId();
                 obj["old_name"] = player->getName();
+                obj["new_name"] = generatePlayerName(player->getId(), obj["new_name"].toString());
                 player->setName(obj["new_name"].toString());
                 sendMessageToAllPlayers(obj);
                 sendStatusChanges();

@@ -253,9 +253,14 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
 
-    connect(me.get(), &Player::receivedNewPlayer, [this](int, QString name) {
-        QString message = QString("<strong>%1</strong> has connected.").arg(name);
+    connect(me.get(), &Player::receivedNewPlayer, [this](int id, QString name) {
+        QString message = QString("<strong>%1</strong> has conncted.").arg(name);
         ui->chat_area->appendHtml(message);
+
+        if (id == me->getId()) {
+            me->setName(name);
+            ui->nickname->setText(name);
+        }
     });
 
     connect(me.get(), &Player::playerConnected, [=]() {
@@ -295,14 +300,9 @@ void MainWindow::connectToServer(QString host) {
         ui->chat_area->appendHtml(message);
     });
 
-    connect(me.get(), &Player::otherPlayerChangedName, [=](int id, QString old_name, QString new_name) {
-        QString msg;
-        if (id == me->getId()) {
-            msg = QString(R"(You have changed name to <strong>%1</strong><br/>)").arg(new_name);
-        } else {
-            msg =
-                QString(R"(<strong>%1</strong> changed name to <strong>%2</strong><br/>)").arg(old_name).arg(new_name);
-        }
+    connect(me.get(), &Player::otherPlayerChangedName, [=](QString old_name, QString new_name) {
+        QString msg =
+            QString(R"(<strong>%1</strong> changed name to <strong>%2</strong><br/>)").arg(old_name).arg(new_name);
         ui->chat_area->appendHtml(msg);
     });
 
