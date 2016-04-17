@@ -35,7 +35,7 @@ FORMS    += ui/mainwindow.ui \
             ui/connectdialog.ui \
             ui/colorthemedialog.ui
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
