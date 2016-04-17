@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->difficulty->addItem("Simple", SB::SIMPLE);
     ui->difficulty->addItem("Easy", SB::EASY);
-    ui->difficulty->addItem("Intermedia", SB::INTERMEDIATE);
+    ui->difficulty->addItem("Intermediate", SB::INTERMEDIATE);
     ui->difficulty->addItem("Expert", SB::EXPERT);
 
     ui->start_game->setEnabled(false);
