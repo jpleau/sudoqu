@@ -254,7 +254,7 @@ void MainWindow::connectToServer(QString host) {
     connect(me.get(), &Player::playerDisconnected, this, &MainWindow::disconnectPlayer);
 
     connect(me.get(), &Player::receivedNewPlayer, [this](int id, QString name) {
-        QString message = QString("<strong>%1</strong> has conncted.").arg(name);
+        QString message = QString("<strong>%1</strong> has connected.").arg(name);
         ui->chat_area->appendHtml(message);
 
         if (id == me->getId()) {

@@ -241,10 +241,9 @@ void Game::gameOverWinner(Player *player) {
 }
 
 QString Game::generatePlayerName(int id, QString name) {
-    bool nameChosen = false;
     int inc = 0;
     std::vector<Player *> list_players = listPlayers();
-    while (!nameChosen) {
+    while (true) {
         QString tmp_name = name;
         if (inc > 0) {
             tmp_name = QString("(%1) %2").arg(inc).arg(tmp_name);
@@ -259,8 +258,8 @@ QString Game::generatePlayerName(int id, QString name) {
         if (taken) {
             ++inc;
         } else {
-            nameChosen = true;
             name = tmp_name;
+            break;
         }
     }
     return name;
