@@ -354,6 +354,7 @@ void MainWindow::connectToServer(QString host) {
     connect(ui->frame, &GameFrame::sendNotes, me.get(), &Player::sendNotes);
     connect(me.get(), &Player::receivedNotes, ui->frame, &GameFrame::receivedNotes);
     connect(me.get(), &Player::clearNotes, ui->frame, &GameFrame::clearNotes);
+    connect(ui->frame, &GameFrame::toggleTakingNotes, [=](QString str) { ui->status->showMessage(str); });
 }
 
 void MainWindow::changeName() {

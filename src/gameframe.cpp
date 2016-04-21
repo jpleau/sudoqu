@@ -301,6 +301,11 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
 
     if (key == Qt::Key_Control) {
         takingNotes = !takingNotes;
+        if (takingNotes) {
+            emit toggleTakingNotes("Input mode: NOTE");
+        } else {
+            emit toggleTakingNotes("Input mode: NORMAL");
+        }
         return;
     }
 

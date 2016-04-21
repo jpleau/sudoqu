@@ -57,6 +57,7 @@ signals:
     void sendValue(int = -1, int = -1);
     void sendValues(std::vector<int> &);
     void sendNotes(int, std::vector<int> &);
+    void toggleTakingNotes(QString);
 
 protected:
     void paintEvent(QPaintEvent *) override;

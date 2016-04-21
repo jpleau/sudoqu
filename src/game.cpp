@@ -35,6 +35,7 @@ void Game::start_game(SB::Difficulty difficulty, GameMode m) {
     mode = m;
 
     coop_boards.clear();
+    notes.clear();
     player_boards.clear();
 
     board.reset(new Sudoku);
