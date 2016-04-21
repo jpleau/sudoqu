@@ -73,8 +73,11 @@ void ColorThemeDialog::reloadColors() {
             widget->setStyleSheet("background-color: " + *w.second);
             form->addRow(label, widget);
             connect(widget, &ColorWidget::focused, [=]() {
-                *w.second = QColorDialog::getColor(*w.second).name();
-                widget->setStyleSheet("background-color: " + *w.second);
+                QColor color = QColorDialog::getColor(*w.second);
+                if (color.isValid()) {
+                    *w.second = color.name();
+                    widget->setStyleSheet("background-color: " + *w.second);
+                }
             });
             widgets.push_back(std::unique_ptr<QWidget>(label));
             widgets.push_back(std::unique_ptr<QWidget>(widget));
