@@ -65,6 +65,14 @@ void Settings::setColorTheme(ColorTheme theme) {
     setValue("colors", QVariant::fromValue(theme));
 }
 
+bool Settings::getNotesEnabled() const {
+    return this->value("notesEnabled", true).toBool();
+}
+
+void Settings::setNotesEnabled(bool enabled) {
+    this->setValue("notesEnabled", enabled);
+}
+
 ColorTheme Settings::getColorTheme() {
     return value("colors", QVariant::fromValue(ColorTheme())).value<ColorTheme>();
 }

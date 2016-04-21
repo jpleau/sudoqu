@@ -81,6 +81,7 @@ private:
     std::unique_ptr<QAction> aboutAction;
     std::unique_ptr<QAction> aboutQtAction;
     std::unique_ptr<QAction> colorsAction;
+    std::unique_ptr<QAction> enableNotesAction;
 };
 }
 

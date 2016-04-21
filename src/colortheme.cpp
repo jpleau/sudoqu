@@ -77,20 +77,20 @@ std::map<ColorTheme::Theme, std::map<QString, QString>> ColorTheme::themes = {
 
     },
 
-    {MOLOKAI,
+    {SUDOKAI,
      {
-         {"background", "#808080"},
-         {"foreground", "#F8F8F2"},
-         {"outer_lines", "#455354"},
-         {"inner_lines", "#455354"},
-         {"focus_background", "#ffff00"},
+         {"background", "#3d3d3d"},
+         {"foreground", "#ffffff"},
+         {"outer_lines", "#1c1f1e"},
+         {"inner_lines", "#141414"},
+         {"focus_background", "#008a85"},
          {"focus_foreground", "#000000"},
-         {"given_background", "#272822"},
+         {"given_background", "#807878"},
          {"given_foreground", "#000000"},
-         {"filled_background", "#ffffff"},
+         {"filled_background", "#34944c"},
          {"filled_foreground", "#000000"},
-         {"other_focus_background", "#66D9EF"},
-         {"other_focus_foreground", "#f8f8f2"},
+         {"other_focus_background", "#adeff9"},
+         {"other_focus_foreground", "#000000"},
 
      }}
 

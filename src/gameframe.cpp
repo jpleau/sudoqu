@@ -137,6 +137,11 @@ void GameFrame::clearNotes() {
     repaint();
 }
 
+void GameFrame::setNotesEnabled(bool enabled) {
+    notesEnabled = enabled;
+    repaint();
+}
+
 void GameFrame::paintEvent(QPaintEvent *) {
     if (!active) {
         return;
@@ -212,7 +217,7 @@ void GameFrame::paintEvent(QPaintEvent *) {
             painter.setPen(pen);
 
             std::vector<int> &notes_pos = notes[pos];
-            if (!notes_pos.empty()) {
+            if (notesEnabled && !notes_pos.empty()) {
                 painter.setFont(fontNotes);
                 for (auto note : notes_pos) {
                     QString text = QString::number(note);
@@ -299,7 +304,7 @@ void GameFrame::mouseReleaseEvent(QMouseEvent *event) {
 void GameFrame::keyPressEvent(QKeyEvent *event) {
     int key = event->key();
 
-    if (key == Qt::Key_Control) {
+    if (key == Qt::Key_Control && notesEnabled) {
         takingNotes = !takingNotes;
         if (takingNotes) {
             emit toggleTakingNotes("Input mode: NOTE");
@@ -342,7 +347,7 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
 
     } else {
         if (key == Qt::Key_0 || key == Qt::Key_Backspace || key == Qt::Key_Delete) {
-            if (!takingNotes) {
+            if (!takingNotes || !notesEnabled) {
                 setAt(focused, 0, true);
             } else {
                 notes[focused].clear();
@@ -355,7 +360,7 @@ void GameFrame::keyPressEvent(QKeyEvent *event) {
         } else {
             auto check = key_map.find(key);
             if (check != key_map.end()) {
-                if (!takingNotes) {
+                if (!takingNotes || !notesEnabled) {
                     setAt(focused, check->second, true);
                 } else {
                     if (getAt(focused) > 0) {

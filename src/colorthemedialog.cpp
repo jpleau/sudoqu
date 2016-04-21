@@ -39,7 +39,7 @@ ColorThemeDialog::ColorThemeDialog(ColorTheme current_theme, QWidget *parent)
     ui->select_theme->blockSignals(true);
     ui->select_theme->addItem("", ColorTheme::NONE);
     ui->select_theme->addItem("Default", ColorTheme::DEFAULT);
-    ui->select_theme->addItem("Molokai", ColorTheme::MOLOKAI);
+    ui->select_theme->addItem("Sudokai", ColorTheme::SUDOKAI);
     ui->select_theme->blockSignals(false);
     reloadColors();
 }

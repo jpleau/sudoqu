@@ -50,6 +50,7 @@ public:
     void setColorTheme(ColorTheme);
     void receivedNotes(int, std::vector<int> &);
     void clearNotes();
+    void setNotesEnabled(bool);
 
 signals:
     void sendFocusedSquare(int);
@@ -86,6 +87,8 @@ private:
     ColorTheme colors;
 
     bool takingNotes = false;
+
+    bool notesEnabled = false;
 };
 }
 

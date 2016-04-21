@@ -40,6 +40,9 @@ public:
 
     ColorTheme getColorTheme();
     void setColorTheme(ColorTheme);
+
+    bool getNotesEnabled() const;
+    void setNotesEnabled(bool);
 };
 }
 

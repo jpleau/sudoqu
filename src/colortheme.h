@@ -32,7 +32,7 @@ struct ColorTheme {
     enum Theme : int {
         NONE = 1,
         DEFAULT,
-        MOLOKAI,
+        SUDOKAI,
     };
 
     static std::map<Theme, std::map<QString, QString>> themes;

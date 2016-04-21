@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     };
 
     ui->frame->setColorTheme(settings.getColorTheme());
+    ui->frame->setNotesEnabled(settings.getNotesEnabled());
 }
 
 MainWindow::~MainWindow() {
@@ -133,6 +134,14 @@ void MainWindow::setupMenu() {
 
     ui->menuGame->addSeparator();
 
+    enableNotesAction = std::make_unique<QAction>("Enable notes", this);
+    enableNotesAction->setCheckable(true);
+    enableNotesAction->setChecked(settings.getNotesEnabled());
+
+    ui->menuGame->addAction(enableNotesAction.get());
+
+    ui->menuGame->addSeparator();
+
     colorsAction = std::make_unique<QAction>("Configure colors", this);
 
     ui->menuGame->addAction(colorsAction.get());
@@ -184,6 +193,11 @@ void MainWindow::setupMenu() {
     connect(aboutQtAction.get(), &QAction::triggered, QApplication::aboutQt);
 
     connect(colorsAction.get(), &QAction::triggered, this, &MainWindow::configureColors);
+
+    connect(enableNotesAction.get(), &QAction::toggled, [=](bool checked) {
+        settings.setNotesEnabled(checked);
+        ui->frame->setNotesEnabled(checked);
+    });
 }
 
 void MainWindow::startServer(bool acceptConnections) {
