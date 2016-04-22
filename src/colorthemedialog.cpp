@@ -17,6 +17,7 @@
  */
 
 #include "colorthemedialog.h"
+#include "gameframe.h"
 #include "ui_colorthemedialog.h"
 
 #include <QColorDialog>
@@ -26,8 +27,8 @@
 
 namespace Sudoqu {
 
-ColorThemeDialog::ColorThemeDialog(ColorTheme current_theme, QWidget *parent)
-    : QDialog(parent), theme(current_theme), ui(new Ui::ColorThemeDialog) {
+ColorThemeDialog::ColorThemeDialog(ColorTheme current_theme, GameFrame *frame, QWidget *parent)
+    : QDialog(parent), theme(current_theme), ui(new Ui::ColorThemeDialog), frame(frame) {
     ui->setupUi(this);
 
     connect(ui->select_theme, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int) {
@@ -77,6 +78,8 @@ void ColorThemeDialog::reloadColors() {
                 if (color.isValid()) {
                     *w.second = color.name();
                     widget->setStyleSheet("background-color: " + *w.second);
+                    frame->setColorTheme(theme);
+                    frame->repaint();
                 }
             });
             widgets.push_back(std::unique_ptr<QWidget>(label));

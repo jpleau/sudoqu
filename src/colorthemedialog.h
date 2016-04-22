@@ -35,6 +35,7 @@ class ColorThemeDialog;
 class QLabel;
 namespace Sudoqu {
 
+class GameFrame;
 class ColorWidget : public QLineEdit {
     Q_OBJECT
 public:
@@ -52,7 +53,7 @@ class ColorThemeDialog : public QDialog {
     Q_OBJECT
 
 public:
-    ColorThemeDialog(ColorTheme, QWidget *parent = 0);
+    ColorThemeDialog(ColorTheme, GameFrame *, QWidget *parent = 0);
 
     ColorTheme getColorTheme() const;
 
@@ -65,6 +66,7 @@ private:
 
     ColorTheme theme;
     Ui::ColorThemeDialog *ui;
+    GameFrame *frame;
 };
 }
 

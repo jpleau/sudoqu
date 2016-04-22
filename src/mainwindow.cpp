@@ -413,13 +413,14 @@ void MainWindow::badVersion(int server_version, int client_version) {
 }
 
 void MainWindow::configureColors() {
-    ColorThemeDialog dialog(settings.getColorTheme());
+    ColorTheme theme = settings.getColorTheme();
+    ColorThemeDialog dialog(theme, ui->frame);
     if (dialog.exec() == QDialog::Accepted) {
-        ColorTheme theme = dialog.getColorTheme();
-
-        settings.setColorTheme(theme);
-        ui->frame->setColorTheme(theme);
-        ui->frame->repaint();
+        theme = dialog.getColorTheme();
     }
+
+    settings.setColorTheme(theme);
+    ui->frame->setColorTheme(theme);
+    ui->frame->repaint();
 }
 }
