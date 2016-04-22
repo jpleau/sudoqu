@@ -34,6 +34,8 @@ ColorThemeDialog::ColorThemeDialog(ColorTheme current_theme, GameFrame *frame, Q
     connect(ui->select_theme, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int) {
         int selected = ui->select_theme->currentData().toInt();
         theme = ColorTheme(static_cast<ColorTheme::Theme>(selected));
+        frame->setColorTheme(theme);
+        frame->repaint();
         reloadColors();
     });
 
