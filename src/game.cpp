@@ -31,8 +31,8 @@ Game::Game(QObject *parent) : QTcpServer(parent) {
     mode = NOT_PLAYING;
 }
 
-void Game::start_game(SB::Difficulty difficulty, GameMode m) {
-    mode = m;
+void Game::start_game(SB::Difficulty difficulty, GameMode mode) {
+    this->mode = mode;
 
     coop_boards.clear();
     notes.clear();

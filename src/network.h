@@ -37,8 +37,8 @@ public:
      * @fn static void sendNetworkMessage(QJsonObject &, QTcpSocket *)
      * @brief Sends a network message encoded in JSON
      *
-     * @param QJsonObject obj The QJsonObject that will be encoded in JSON
-     * @param QTcpSocket* socket The client which will receive this message
+     * @param obj The QJsonObject that will be encoded in JSON
+     * @param socket The client which will receive this message
      */
     static void sendNetworkMessage(QJsonObject &, QTcpSocket *);
 
@@ -46,7 +46,7 @@ public:
      * @fn static QJsonObject readNetworkMessage(QString)
      * @brief Reads a JSON encoded message
      *
-     * @param QString data The JSON string received over network
+     * @param data The JSON string received over network
      * @return a Qt JSON object
      */
     static QJsonObject readNetworkMessage(QString);

@@ -42,7 +42,7 @@ public:
 
     /**
      * @brief starts the server
-     * @param bool acceptRemote determines if we accept remote connections (single / multiplayer)
+     * @param acceptRemote determines if we accept remote connections (single / multiplayer)
      */
     void start_server(bool);
 
@@ -54,13 +54,13 @@ public:
     /**
      * @brief starts a game (puzzle)
      * @param difficulty the difficulty of the puzzle
-     * @param Sudoqu::GameMode mode single player or coop
+     * @param mode single player or coop
      */
     void start_game(SB::Difficulty, GameMode);
 
     /**
      * @brief sets the team list available to players
-     * @param QStringList teams the list of team names
+     * @param teams the list of team names
      */
     void setTeamNames(QStringList);
 
