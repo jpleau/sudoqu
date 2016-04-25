@@ -279,7 +279,9 @@ void MainWindow::connectToServer(QString host) {
 
     connect(me.get(), &Player::playerConnected, [=]() {
         ui->chat_send_button->setEnabled(true);
-        ui->clear_fields->setEnabled(true);
+        if (game) {
+            ui->clear_fields->setEnabled(true);
+        }
         connect(ui->chat_send_button, &QPushButton::clicked, this, &MainWindow::sendChatMessage);
         connect(ui->chat_text, &QLineEdit::returnPressed, this, &MainWindow::sendChatMessage);
     });
