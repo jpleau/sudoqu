@@ -5,3 +5,4 @@ data/
 .ycm_extra_conf.py*
 resources.qrc
 doc/
+.color_coded

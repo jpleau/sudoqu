@@ -86,9 +86,9 @@ public:
     void sendValue(int, int);
 
     /**
- * @brief send a complete board to the server
- * @param board the values
- */
+        * @brief send a complete board to the server
+        * @param board the values
+        */
     void sendValues(std::vector<int> &);
 
     /**

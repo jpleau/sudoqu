@@ -47,6 +47,8 @@ enum GameMode : int {
     VERSUS,
     COOP,
 };
+
+static const int MAX_PLAYERNAME_LENGTH = 25;
 }
 
 #endif

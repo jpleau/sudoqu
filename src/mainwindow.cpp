@@ -34,18 +34,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->nickname->setText(settings.getName());
 
-    ui->difficulty->addItem("Simple", SB::SIMPLE);
-    ui->difficulty->addItem("Easy", SB::EASY);
-    ui->difficulty->addItem("Intermediate", SB::INTERMEDIATE);
-    ui->difficulty->addItem("Expert", SB::EXPERT);
-
     ui->start_game->setEnabled(false);
-    ui->difficulty->setEnabled(false);
 
     setupMenu();
 
     connect(ui->nickname, &QLineEdit::returnPressed, this, &MainWindow::changeName);
-    connect(ui->nickname_change, &QToolButton::clicked, this, &MainWindow::changeName);
     connect(ui->clear_fields, &QPushButton::clicked, ui->frame, &GameFrame::clearBoard);
 
     ui->game_mode->setId(ui->puzzle_versus, VERSUS);
@@ -58,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->frame->setColorTheme(settings.getColorTheme());
     ui->frame->setNotesEnabled(settings.getNotesEnabled());
+
+    ui->nickname->setMaxLength(MAX_PLAYERNAME_LENGTH);
 }
 
 MainWindow::~MainWindow() {
@@ -96,7 +91,6 @@ void MainWindow::disconnectPlayer() {
     disconnectAction->setEnabled(false);
     ui->nickname->setEnabled(true);
     ui->start_game->setEnabled(false);
-    ui->difficulty->setEnabled(false);
     ui->chat_area->clear();
     ui->player_list->clear();
     ui->frame->stop();
@@ -204,15 +198,13 @@ void MainWindow::startServer(bool acceptConnections) {
     game.reset(new Game(this));
     game->start_server(acceptConnections);
     connect(ui->start_game, &QPushButton::clicked, [=]() {
-        int selectedDifficulty = ui->difficulty->itemData(ui->difficulty->currentIndex()).toInt();
-        SB::Difficulty difficulty = static_cast<SB::Difficulty>(selectedDifficulty);
+        SB::Difficulty difficulty = SB::SIMPLE;
         GameMode mode = static_cast<GameMode>(ui->game_mode->checkedId());
         game->start_game(difficulty, mode);
 
     });
     stopServerAction->setEnabled(true);
     ui->start_game->setEnabled(true);
-    ui->difficulty->setEnabled(true);
     ui->puzzle_coop->setEnabled(true);
     ui->puzzle_versus->setEnabled(true);
     game->setTeamNames(settings.getTeamNames());
@@ -226,7 +218,6 @@ void MainWindow::stopServer() {
     stopServerAction->setEnabled(false);
     hostGameAction->setEnabled(true);
     ui->start_game->setEnabled(false);
-    ui->difficulty->setEnabled(false);
 }
 
 void MainWindow::connectToServer(QString host) {
@@ -258,7 +249,6 @@ void MainWindow::connectToServer(QString host) {
     disconnectAction->setEnabled(true);
     if (game) {
         ui->start_game->setEnabled(true);
-        ui->difficulty->setEnabled(true);
     }
 
     ui->select_team->blockSignals(true);
